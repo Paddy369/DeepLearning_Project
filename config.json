@@ -1,10 +1,10 @@
 {
-    "batch_size_train": 128,
+    "batch_size_train": 64,
     "batch_size_val": 64,
     "batch_size_test": 64,
     "batch_size_predict": 8,
     "epochs": 10,
-    "image_size": 128,
+    "image_size": 256,
     "augmentation": false,
     "learning_rate": {
         "decay": false,

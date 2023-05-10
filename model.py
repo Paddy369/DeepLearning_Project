@@ -41,7 +41,7 @@ def load_data(path, batch_size = 4):
                       "Spider", "Tiger", "Zebra"],      
         color_mode="rgb",                               # color images
         batch_size = batch_size,                        # number of images to retrieve at a time
-        image_size=(image_size, image_size),            # images are resized to 128x128
+        image_size=(image_size, image_size),            # images are resized to 256x256
         shuffle=True,                                   # shuffle the data
         seed=1,                                         # set the random seed for shuffling
         validation_split=None,                          # no data is used for validation
@@ -54,8 +54,8 @@ def load_data(path, batch_size = 4):
 # load the data
 train_path = "train_aug" if augmentation else "train"
 train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches of 64
-val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches of 8  
-test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches of 8
+val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches of 64  
+test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches of 64
 
 # load the resnet model with imagenet weights and without the top layer
 resnet = tf.keras.applications.resnet.ResNet50(
