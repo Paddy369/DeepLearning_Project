@@ -3,9 +3,9 @@
     "batch_size_val": 8,
     "batch_size_test": 1,
     "batch_size_predict": 8,
-    "epochs": 3,
-    "image_size": 128,
-    "augmentation": false,
+    "epochs": 10,
+    "image_size": 256,
+    "augmentation": true,
     "weight_decay": false,
     "learning_rate_decay": false,
     "layers": [

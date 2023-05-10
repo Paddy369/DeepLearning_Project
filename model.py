@@ -29,7 +29,7 @@ layer_settings = settings["layers"]                     # layer configurations
 ################################################
 
 # loads the data for a given path
-def load_data(path, batch_size = 4, shuffle=True):
+def load_data(path, batch_size = 4):
     # read the images from a given directory and create a dataset with the subdirectories as labels
     return tf.keras.utils.image_dataset_from_directory (
         BASE_DIR + path,                                # path to the data directory
@@ -43,7 +43,7 @@ def load_data(path, batch_size = 4, shuffle=True):
         color_mode="rgb",                               # color images
         batch_size = batch_size,                        # number of images to retrieve at a time
         image_size=(image_size, image_size),            # images are resized to 128x128
-        shuffle=shuffle,                                   # shuffle the data
+        shuffle=True,                                   # shuffle the data
         seed=1,                                         # set the random seed for shuffling
         validation_split=None,                          # no data is used for validation
         subset=None,                                    # no data is used as a subset
@@ -57,7 +57,6 @@ train_path = "train_aug" if augmentation else "train"
 train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches of 64
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches of 8  
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches of 8
-predict_batches = load_data("predict", predict_batch_size, False)               # prediction data is loaded in batches of 1
 
 # load the resnet model with imagenet weights and without the top layer
 resnet = tf.keras.applications.resnet.ResNet50(
@@ -73,6 +72,8 @@ for layer in resnet.layers:
 
 # loop for testing out different learning rates
 for i in range(0, 1):
+    print("Current Loop: " + str(i) )
+
     # create the model
     model = Sequential()
     # add the resnet model
@@ -96,7 +97,7 @@ for i in range(0, 1):
     learning_rate = 10**(-i)
 
     # good learning rate
-    learning_rate = 0.000001
+    learning_rate = 0.00001
 
     # compile the model
     model.compile(optimizer=optimizers.Adam(learning_rate=learning_rate),
@@ -112,7 +113,7 @@ for i in range(0, 1):
     shutil.copyfile("config.json", "./" + log_dir + "/config.json")
 
     # create a callback to log the data for tensorboard
-    tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+    tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True)
 
     # train the model
     history = model.fit(train_batches, validation_data=val_batches, callbacks=[tensorboard_callback], epochs=epochs)
