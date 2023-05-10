@@ -4,9 +4,10 @@ import os
 import tensorflow as tf
 from datetime import datetime
 from tensorflow.keras import layers, Sequential, optimizers, losses, callbacks
+from tensorflow.keras.regularizers import l1, l2 , l1_l2
 
 # ID of the test iteration
-ID = 1
+ID = "v2_size128epoch10"
 
 # load the model settings
 with open("config.json", 'r') as file:
@@ -22,8 +23,6 @@ test_batch_size = settings["batch_size_test"]           # batch size for trainin
 predict_batch_size = settings["batch_size_predict"]     # batch size for training
 image_size = settings["image_size"]                     # image size
 augmentation = settings["augmentation"]                 # is augmentation enabled
-weight_decay = settings["weight_decay"]                 # is weight decay enabled
-learning_rate_decay = settings["learning_rate_decay"]   # is learning rate decay enabled
 layer_settings = settings["layers"]                     # layer configurations
 
 ################################################
@@ -43,7 +42,7 @@ def load_data(path, batch_size = 4, shuffle=True):
         color_mode="rgb",                               # color images
         batch_size = batch_size,                        # number of images to retrieve at a time
         image_size=(image_size, image_size),            # images are resized to 128x128
-        shuffle=shuffle,                                   # shuffle the data
+        shuffle=shuffle,                                # shuffle the data
         seed=1,                                         # set the random seed for shuffling
         validation_split=None,                          # no data is used for validation
         subset=None,                                    # no data is used as a subset
@@ -57,7 +56,6 @@ train_path = "train_aug" if augmentation else "train"
 train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches of 64
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches of 8  
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches of 8
-predict_batches = load_data("predict", predict_batch_size, False)               # prediction data is loaded in batches of 1
 
 # load the resnet model with imagenet weights and without the top layer
 resnet = tf.keras.applications.resnet.ResNet50(
@@ -85,27 +83,47 @@ for i in range(0, 1):
         elif ls["type"] == "batch_normalization":
             model.add(layers.BatchNormalization())
         elif ls["type"] == "dense":
-            model.add(layers.Dense(ls["size"], activation=ls["activation"]))
+            kernel_regularizer = None; bias_regularizer = None
+
+            # create kernel regularizer if specified
+            if "kernel_regularizer" in ls:
+                kr_type = ls["kernel_regularizer"]["type"]
+                kr_value = ls["kernel_regularizer"]["value"]
+                kernel_regularizer = l1(kr_value) if kr_type == "l1" else l2(kr_value) if kr_type == "l2" else l1_l2(kr_value)
+                
+            # create bias regularizer if specified
+            if "bias_regularizer" in ls:
+                br_type = ls["bias_regularizer"]["type"]
+                br_value = ls["bias_regularizer"]["value"]
+                bias_regularizer = l1(br_value) if br_type == "l1" else l2(br_value) if br_type == "l2" else l1_l2(br_value)
+
+            model.add(layers.Dense(ls["size"], activation=ls["activation"], kernel_regularizer=kernel_regularizer, bias_regularizer=bias_regularizer))
         elif ls["type"] == "dropout":
             model.add(layers.Dropout(ls["value"], seed=ls["seed"]))
 
     # print the model summary
     # model.summary()
 
-    # calculate the learning rate
-    learning_rate = 10**(-i)
+    # calculate the learning rate for test purposes
+    # lr = 10**(-i)
 
-    # good learning rate
-    learning_rate = 0.000001
-
-    # compile the model
-    model.compile(optimizer=optimizers.Adam(learning_rate=learning_rate),
-                loss=losses.SparseCategoricalCrossentropy(),
-                metrics=["accuracy"])
+    # initial learning rate
+    lr = settings["learning_rate"]["initial_lr"]
 
     # path to the log directory
     now = datetime.now()
-    log_dir = "logs/#" + str(ID) + " " + now.strftime("%d.%m.%Y %H-%M-%S") + " lr_" + str(learning_rate)
+    log_dir = "logs/#" + str(ID) + " " + now.strftime("%d.%m.%Y %H-%M-%S") + " lr_" + str(lr)
+
+    if settings["learning_rate"]["decay"] == True:
+        lr = optimizers.schedules.ExponentialDecay(lr, 
+            decay_steps=settings["learning_rate"]["steps"], 
+            decay_rate=settings["learning_rate"]["decay_rate"], 
+            staircase=False, name=None)
+
+    # compile the model
+    model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+                loss=losses.SparseCategoricalCrossentropy(),
+                metrics=["accuracy"])
 
     # copy the config file to the log directory
     os.makedirs("./" + log_dir, exist_ok=True)
