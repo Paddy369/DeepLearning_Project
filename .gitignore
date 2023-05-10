@@ -165,3 +165,4 @@ cython_debug/
 solution.py
 /logs
 /model
+/model_save

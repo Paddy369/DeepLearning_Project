@@ -16,7 +16,7 @@ predict_batches = tf.keras.utils.image_dataset_from_directory (
     class_names=None,
     color_mode="rgb",
     batch_size=1,
-    image_size=(128, 128),
+    image_size=(256, 256),
     shuffle=False,
     seed=1,
     validation_split=None,
@@ -27,7 +27,7 @@ predict_batches = tf.keras.utils.image_dataset_from_directory (
 )
 
 # load the tensorflow model
-model = tf.keras.models.load_model('model')
+model = tf.keras.models.load_model('model_save')
 
 model.summary()
 
