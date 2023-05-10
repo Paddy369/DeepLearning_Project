@@ -5,6 +5,9 @@ import tensorflow as tf
 from datetime import datetime
 from tensorflow.keras import layers, Sequential, optimizers, losses, callbacks
 
+# ID of the test iteration
+ID = 1
+
 # load the model settings
 with open("config.json", 'r') as file:
     settings = json.load(file)
@@ -27,7 +30,7 @@ layer_settings = settings["layers"]                     # layer configurations
 # loads the data for a given path
 def load_data(path, batch_size = 4):
     # read the images from a given directory and create a dataset with the subdirectories as labels
-    data = tf.keras.utils.image_dataset_from_directory (
+    return tf.keras.utils.image_dataset_from_directory (
         BASE_DIR + path,                                # path to the data directory
         labels="inferred",                              # class labels are inferred from the subdirectory structure
         label_mode="int",                               # labels are returned as integers
@@ -47,7 +50,6 @@ def load_data(path, batch_size = 4):
         follow_links=False,                             # don't follow symbolic links
         crop_to_aspect_ratio=False                      # don't crop the images
     )
-    return data
 
 # load the data
 train_path = "train_aug" if augmentation else "train"
@@ -67,38 +69,41 @@ resnet = tf.keras.applications.resnet.ResNet50(
 for layer in resnet.layers:
     layer.trainable = False
 
-# create the model
-model = Sequential()
-# add the resnet model
-model.add(resnet)
-
-# load the layer configurations and add them to the model as the top layers
-for ls in layer_settings:
-    if ls["type"] == "flatten":
-        model.add(layers.Flatten())
-    elif ls["type"] == "batch_normalization":
-        model.add(layers.BatchNormalization())
-    elif ls["type"] == "dense":
-        model.add(layers.Dense(ls["size"], activation=ls["activation"]))
-    elif ls["type"] == "dropout":
-        model.add(layers.Dropout(ls["value"]))
-
-# print the model summary
-model.summary()
-
 # loop for testing out different learning rates
-for i in range(0, 5):
+for i in range(0, 1):
+    # create the model
+    model = Sequential()
+    # add the resnet model
+    model.add(resnet)
+
+    # load the layer configurations and add them to the model as the top layers
+    for ls in layer_settings:
+        if ls["type"] == "flatten":
+            model.add(layers.Flatten())
+        elif ls["type"] == "batch_normalization":
+            model.add(layers.BatchNormalization())
+        elif ls["type"] == "dense":
+            model.add(layers.Dense(ls["size"], activation=ls["activation"]))
+        elif ls["type"] == "dropout":
+            model.add(layers.Dropout(ls["value"]))
+
+    # print the model summary
+    # model.summary()
+
     # calculate the learning rate
     learning_rate = 10**(-i)
 
+    # good learning rate
+    learning_rate = 0.000001
+
     # compile the model
     model.compile(optimizer=optimizers.Adam(learning_rate=learning_rate),
-                  loss=losses.SparseCategoricalCrossentropy(),
-                  metrics=["accuracy"])
+                loss=losses.SparseCategoricalCrossentropy(),
+                metrics=["accuracy"])
 
     # path to the log directory
     now = datetime.now()
-    log_dir = "logs/" + now.strftime("%d.%m.%Y %H-%M-%S") + " lr_" + str(learning_rate)
+    log_dir = "logs/#" + str(ID) + " " + now.strftime("%d.%m.%Y %H-%M-%S") + " lr_" + str(learning_rate)
 
     # copy the config file to the log directory
     os.makedirs("./" + log_dir, exist_ok=True)
