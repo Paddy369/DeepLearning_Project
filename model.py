@@ -1,5 +1,6 @@
 import json
-import matplotlib.pyplot as plt
+import shutil
+import os
 import tensorflow as tf
 from datetime import datetime
 from tensorflow.keras import layers, Sequential, optimizers, losses, callbacks
@@ -10,7 +11,7 @@ with open("config.json", 'r') as file:
 
 ################### SETTINGS ###################
 
-BASE_DIR = settings["base_dir"]                         # base directory
+BASE_DIR = "images/"                                    # base directory
 epochs = settings["epochs"]                             # number of epochs
 names = settings["class_names"]                         # class names
 train_batch_size = settings["batch_size_train"]         # batch size for training
@@ -21,6 +22,7 @@ augmentation = settings["augmentation"]                 # is augmentation enable
 weight_decay = settings["weight_decay"]                 # is weight decay enabled
 learning_rate_decay = settings["learning_rate_decay"]   # is learning rate decay enabled
 batch_normalization = settings["batch_normalization"]   # is batch normalization enabled
+layer_settings = settings["layers"]                             # layer configurations
 
 ################################################
 
@@ -31,7 +33,11 @@ def load_data(path, batch_size = 4):
         BASE_DIR + path,                                # path to the data directory
         labels="inferred",                              # class labels are inferred from the subdirectory structure
         label_mode="int",                               # labels are returned as integers
-        class_names=names,                              # names of the classes
+        class_names= ["Beetle", "Butterfly", "Cat",     # names of the classes
+                      "Cow", "Dog", "Elephant", 
+                      "Gorilla", "Hippo", "Lizard", 
+                      "Monkey", "Mouse", "Panda", 
+                      "Spider", "Tiger", "Zebra"],      
         color_mode="rgb",                               # color images
         batch_size = batch_size,                        # number of images to retrieve at a time
         image_size=(image_size, image_size),            # images are resized to 128x128
@@ -68,12 +74,14 @@ model = Sequential()
 # add the resnet model
 model.add(resnet)
 
-# add the top layers
-model.add(layers.Flatten())
-model.add(layers.Dense(256, activation='relu'))
-model.add(layers.Dense(256, activation='relu'))
-model.add(layers.Dropout(0.3))
-model.add(layers.Dense(15, activation='softmax'))
+# load the layer configurations and add them to the model as the top layers
+for ls in layer_settings:
+    if ls["type"] == "flatten":
+        model.add(layers.Flatten())
+    elif ls["type"] == "dense":
+        model.add(layers.Dense(ls["size"], activation=ls["activation"]))
+    elif ls["type"] == "dropout":
+        model.add(layers.Dropout(ls["value"]))
 
 # print the model summary
 model.summary()
@@ -82,6 +90,8 @@ model.summary()
 for i in range(0, 1):
     # calculate the learning rate
     learning_rate = 10**(-i)
+    # for testing
+    learning_rate = 0.001
 
     # compile the model
     model.compile(optimizer=optimizers.Adam(learning_rate=learning_rate),
@@ -90,10 +100,11 @@ for i in range(0, 1):
 
     # path to the log directory
     now = datetime.now()
-    log_dir = "logs/" + now.strftime("%d.%m.%Y_%H-%M-%S")
-    log_dir += "_aug_" + str(augmentation) 
-    log_dir += "_epochs_" + str(epochs) 
-    log_dir += "_lr_" + str(learning_rate)
+    log_dir = "logs/" + now.strftime("%d.%m.%Y %H;%M;%S") + "_lr_" + str(learning_rate)
+
+    # copy the config file to the log directory
+    os.makedirs("./" + log_dir, exist_ok=True)
+    shutil.copyfile("config.json", "./" + log_dir + "/config.json")
 
     # create a callback to log the data for tensorboard
     tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)

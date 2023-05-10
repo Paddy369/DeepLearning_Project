@@ -1,13 +1,40 @@
 {
-    "base_dir": "images/",
     "batch_size_train": 64,
     "batch_size_val": 8,
     "batch_size_test": 1,
-    "epochs": 1,
+    "epochs": 5,
     "image_size": 128,
-    "class_names": ["Beetle", "Butterfly", "Cat", "Cow", "Dog", "Elephant", "Gorilla", "Hippo", "Lizard", "Monkey", "Mouse", "Panda", "Spider", "Tiger", "Zebra"],
     "augmentation": false,
     "weight_decay": false,
     "learning_rate_decay": false,
-    "batch_normalization": false
+    "batch_normalization": false,
+    "layers": [
+        {
+            "type": "flatten",
+            "value": 0.4 
+        },
+        {
+            "type": "dense",
+            "size": 256,
+            "activation": "relu"
+        },
+        {
+            "type": "dropout",
+            "value": 0.4 
+        },
+        {
+            "type": "dense",
+            "size": 128,
+            "activation": "relu"
+        },
+        {
+            "type": "dropout",
+            "value": 0.1 
+        },
+        {
+            "type": "dense",
+            "size": 15,
+            "activation": "softmax"
+        }
+    ]
 }
