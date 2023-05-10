@@ -13,7 +13,6 @@ with open("config.json", 'r') as file:
 
 BASE_DIR = "images/"                                    # base directory
 epochs = settings["epochs"]                             # number of epochs
-names = settings["class_names"]                         # class names
 train_batch_size = settings["batch_size_train"]         # batch size for training
 val_batch_size = settings["batch_size_val"]             # batch size for training
 test_batch_size = settings["batch_size_test"]           # batch size for training
@@ -21,8 +20,7 @@ image_size = settings["image_size"]                     # image size
 augmentation = settings["augmentation"]                 # is augmentation enabled
 weight_decay = settings["weight_decay"]                 # is weight decay enabled
 learning_rate_decay = settings["learning_rate_decay"]   # is learning rate decay enabled
-batch_normalization = settings["batch_normalization"]   # is batch normalization enabled
-layer_settings = settings["layers"]                             # layer configurations
+layer_settings = settings["layers"]                     # layer configurations
 
 ################################################
 
@@ -78,6 +76,8 @@ model.add(resnet)
 for ls in layer_settings:
     if ls["type"] == "flatten":
         model.add(layers.Flatten())
+    elif ls["type"] == "batch_normalization":
+        model.add(layers.BatchNormalization())
     elif ls["type"] == "dense":
         model.add(layers.Dense(ls["size"], activation=ls["activation"]))
     elif ls["type"] == "dropout":
@@ -87,11 +87,9 @@ for ls in layer_settings:
 model.summary()
 
 # loop for testing out different learning rates
-for i in range(0, 1):
+for i in range(0, 5):
     # calculate the learning rate
     learning_rate = 10**(-i)
-    # for testing
-    learning_rate = 0.001
 
     # compile the model
     model.compile(optimizer=optimizers.Adam(learning_rate=learning_rate),
@@ -100,7 +98,7 @@ for i in range(0, 1):
 
     # path to the log directory
     now = datetime.now()
-    log_dir = "logs/" + now.strftime("%d.%m.%Y %H;%M;%S") + "_lr_" + str(learning_rate)
+    log_dir = "logs/" + now.strftime("%d.%m.%Y %H-%M-%S") + " lr_" + str(learning_rate)
 
     # copy the config file to the log directory
     os.makedirs("./" + log_dir, exist_ok=True)
@@ -113,4 +111,9 @@ for i in range(0, 1):
     history = model.fit(train_batches, validation_data=val_batches, callbacks=[tensorboard_callback], epochs=epochs)
 
     # evaluate the model
-    model.evaluate(test_batches, verbose=2)
+    results = model.evaluate(test_batches, verbose=2)
+
+    # save the test results
+    f = open(log_dir + "/test_results.txt", "a")
+    f.write("Loss: " + str(results[0]) + ", Accuracy: " + str(results[1]))
+    f.close()

@@ -1,17 +1,18 @@
 {
     "batch_size_train": 64,
     "batch_size_val": 8,
-    "batch_size_test": 1,
-    "epochs": 5,
+    "batch_size_test": 4,
+    "epochs": 10,
     "image_size": 128,
     "augmentation": false,
     "weight_decay": false,
     "learning_rate_decay": false,
-    "batch_normalization": false,
     "layers": [
         {
-            "type": "flatten",
-            "value": 0.4 
+            "type": "flatten"
+        },
+        {
+            "type": "batch_normalization"
         },
         {
             "type": "dense",
