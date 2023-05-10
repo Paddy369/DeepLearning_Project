@@ -8,11 +8,12 @@
     "augmentation": false,
     "weight_decay": false,
     "learning_rate_decay": false,
-    "batch_normalization": false,
     "layers": [
         {
-            "type": "flatten",
-            "value": 0.4 
+            "type": "flatten"
+        },
+        {
+            "type": "batch_normalization"
         },
         {
             "type": "dense",
