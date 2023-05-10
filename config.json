@@ -22,7 +22,8 @@
         },
         {
             "type": "dropout",
-            "value": 0.4 
+            "value": 0.4, 
+            "seed": 1
         },
         {
             "type": "dense",
@@ -31,7 +32,8 @@
         },
         {
             "type": "dropout",
-            "value": 0.1 
+            "value": 0.1, 
+            "seed": 1
         },
         {
             "type": "dense",

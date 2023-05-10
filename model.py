@@ -26,7 +26,7 @@ layer_settings = settings["layers"]                     # layer configurations
 ################################################
 
 # loads the data for a given path
-def load_data(path, batch_size = 4):
+def load_data(path, batch_size = 4, shuffle=True):
     # read the images from a given directory and create a dataset with the subdirectories as labels
     data = tf.keras.utils.image_dataset_from_directory (
         BASE_DIR + path,                                # path to the data directory
@@ -40,7 +40,7 @@ def load_data(path, batch_size = 4):
         color_mode="rgb",                               # color images
         batch_size = batch_size,                        # number of images to retrieve at a time
         image_size=(image_size, image_size),            # images are resized to 128x128
-        shuffle=True,                                   # shuffle the data
+        shuffle=shuffle,                                   # shuffle the data
         seed=1,                                         # set the random seed for shuffling
         validation_split=None,                          # no data is used for validation
         subset=None,                                    # no data is used as a subset
@@ -55,7 +55,7 @@ train_path = "train_aug" if augmentation else "train"
 train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches of 64
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches of 8  
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches of 8
-predict_batches = load_data("predict", predict_batch_size)               # prediction data is loaded in batches of 1
+predict_batches = load_data("predict", predict_batch_size, False)               # prediction data is loaded in batches of 1
 
 # load the resnet model with imagenet weights and without the top layer
 resnet = tf.keras.applications.resnet.ResNet50(
@@ -83,15 +83,18 @@ for ls in layer_settings:
     elif ls["type"] == "dense":
         model.add(layers.Dense(ls["size"], activation=ls["activation"]))
     elif ls["type"] == "dropout":
-        model.add(layers.Dropout(ls["value"]))
+        model.add(layers.Dropout(ls["value"], seed=ls["seed"]))
 
 # print the model summary
 model.summary()
 
 # loop for testing out different learning rates
-for i in range(0, 5):
+for i in range(0, 1):
     # calculate the learning rate
     learning_rate = 10**(-i)
+
+    # for testing
+    learning_rate = 0.001
 
     # compile the model
     model.compile(optimizer=optimizers.Adam(learning_rate=learning_rate),
@@ -120,6 +123,5 @@ for i in range(0, 5):
     f.write("Loss: " + str(results[0]) + ", Accuracy: " + str(results[1]))
     f.close()
 
-    predict = model.predict(predict_batches)
-    predict = tf.argmax(predict, axis=1)
-    print(predict)
+    # save the model
+    model.save("model")
