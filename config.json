@@ -1,8 +1,9 @@
 {
     "batch_size_train": 64,
     "batch_size_val": 8,
-    "batch_size_test": 4,
-    "epochs": 10,
+    "batch_size_test": 1,
+    "batch_size_predict": 8,
+    "epochs": 3,
     "image_size": 128,
     "augmentation": false,
     "weight_decay": false,
@@ -21,7 +22,8 @@
         },
         {
             "type": "dropout",
-            "value": 0.4 
+            "value": 0.4, 
+            "seed": 1
         },
         {
             "type": "dense",
@@ -30,7 +32,8 @@
         },
         {
             "type": "dropout",
-            "value": 0.1 
+            "value": 0.1, 
+            "seed": 1
         },
         {
             "type": "dense",
