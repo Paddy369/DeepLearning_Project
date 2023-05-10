@@ -8,6 +8,8 @@ from tensorflow.keras import layers, Sequential, utils
 BASE_DIR = 'images/'
 # class names
 names = ["Beetle", "Butterfly", "Cat", "Cow", "Dog", "Elephant", "Gorilla", "Hippo", "Lizard", "Monkey", "Mouse", "Panda", "Spider", "Tiger", "Zebra"]
+# number of epochs
+epochs = 5
 
 # loads the data for a given path
 def load_data(path, batch_size = 4):
@@ -62,10 +64,10 @@ model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001),
               loss=keras.losses.SparseCategoricalCrossentropy(),
               metrics=["accuracy"])
 
-log_dir = "logs/fit/" + "ResNet50" + "_epochs_" + str(epochs)
+log_dir = "log" + "_epochs_" + str(epochs)
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-history = model.fit(train_batches, validation_data=val_batches, callbacks=[tensorboard_callback], epochs=5)
+history = model.fit(train_batches, validation_data=val_batches, callbacks=[tensorboard_callback], epochs=epochs)
 
 model.evaluate(test_batches)
 
