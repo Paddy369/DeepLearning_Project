@@ -13,10 +13,10 @@ with open("config.json", 'r') as file:
 
 BASE_DIR = "images/"                                    # base directory
 epochs = settings["epochs"]                             # number of epochs
-names = settings["class_names"]                         # class names
 train_batch_size = settings["batch_size_train"]         # batch size for training
 val_batch_size = settings["batch_size_val"]             # batch size for training
 test_batch_size = settings["batch_size_test"]           # batch size for training
+predict_batch_size = settings["batch_size_predict"]     # batch size for training
 image_size = settings["image_size"]                     # image size
 augmentation = settings["augmentation"]                 # is augmentation enabled
 weight_decay = settings["weight_decay"]                 # is weight decay enabled
@@ -56,6 +56,7 @@ train_path = "train_aug" if augmentation else "train"
 train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches of 64
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches of 8  
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches of 8
+predict_batches = load_data("predict", predict_batch_size)               # prediction data is loaded in batches of 1
 
 # load the resnet model with imagenet weights and without the top layer
 resnet = tf.keras.applications.resnet.ResNet50(
@@ -113,4 +114,8 @@ for i in range(0, 1):
     history = model.fit(train_batches, validation_data=val_batches, callbacks=[tensorboard_callback], epochs=epochs)
 
     # evaluate the model
-    model.evaluate(test_batches, verbose=2)
+    model.evaluate(test_batches)
+
+    predict = model.predict(predict_batches)
+    predict = tf.argmax(predict, axis=1)
+    print(predict)
