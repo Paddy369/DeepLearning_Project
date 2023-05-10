@@ -163,4 +163,4 @@ cython_debug/
 /model
 /ergebnisse
 solution.py
-/log
+/logs
