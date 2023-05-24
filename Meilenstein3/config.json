@@ -1,0 +1,48 @@
+{
+    "batch_size_train": 64,
+    "batch_size_val": 64,
+    "batch_size_test": 64,
+    "batch_size_predict": 8,
+    "epochs": 10,
+    "image_size": 256,
+    "augmentation": false,
+    "learning_rate": {
+        "decay": false,
+        "initial_lr": 0.00005,
+        "steps": 2000,
+        "decay_rate": 0.96 
+    },
+    "layers": [
+        {
+            "type": "flatten"
+        },
+        {
+            "type": "batch_normalization"
+        },
+        {
+            "type": "dense",
+            "size": 256,
+            "activation": "relu"
+        },
+        {
+            "type": "dropout",
+            "value": 0.4, 
+            "seed": 1
+        },
+        {
+            "type": "dense",
+            "size": 128,
+            "activation": "relu"
+        },
+        {
+            "type": "dropout",
+            "value": 0.2, 
+            "seed": 1
+        },
+        {
+            "type": "dense",
+            "size": 15,
+            "activation": "softmax"
+        }
+    ]
+}

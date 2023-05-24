@@ -160,9 +160,9 @@ cython_debug/
 #.idea/
 
 /images
-/model
-/ergebnisse
+/Meilenstein*/model
+/Meilenstein*/ergebnisse
+/Meilenstein*/logs
+/Meilenstein*/model_save
+
 solution.py
-/logs
-/model
-/model_save

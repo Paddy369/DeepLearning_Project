@@ -15,7 +15,7 @@ with open("config.json", 'r') as file:
 
 ################### SETTINGS ###################
 
-BASE_DIR = "images/"                                    # base directory
+BASE_DIR = "../images/"                                    # base directory
 epochs = settings["epochs"]                             # number of epochs
 train_batch_size = settings["batch_size_train"]         # batch size for training
 val_batch_size = settings["batch_size_val"]             # batch size for training
