@@ -2,7 +2,7 @@ import json
 import shutil
 import os
 import tensorflow as tf
-from model1 import loadModel
+from model import loadModel
 from datetime import datetime
 from tensorflow.keras import optimizers, losses, callbacks
 
@@ -21,7 +21,6 @@ test_batch_size = settings["batch_size_test"]           # batch size for trainin
 predict_batch_size = settings["batch_size_predict"]     # batch size for training
 image_size = settings["image_size"]                     # image size
 augmentation = settings["augmentation"]                 # is augmentation enabled
-layer_settings = settings["layers"]                     # layer configurations
 
 ################################################
 
@@ -64,9 +63,10 @@ model.summary()
 # initial learning rate
 lr = settings["learning_rate"]["initial_lr"]
 
-# path to the log directory
+# path to the log directory and the model directory
 now = datetime.now()
-log_dir = "logs/#" + str(ID) + " " + now.strftime("%d.%m.%Y %H-%M-%S") + " lr_" + str(lr)
+log_dir = "logs/" + now.strftime("%d.%m.%Y %H-%M-%S ") + str(ID)        # for our tensorboard logs and the related model configuration
+model_dir = "models/" + now.strftime("%d.%m.%Y %H-%M-%S ") + str(ID)     # for transparancy reasons (wird mit ins repo eingecheckt)
 
 if settings["learning_rate"]["decay"] == True:
     lr = optimizers.schedules.ExponentialDecay(lr, 
@@ -79,9 +79,14 @@ model.compile(optimizer=optimizers.Adam(learning_rate=lr),
             loss=losses.SparseCategoricalCrossentropy(),
             metrics=["accuracy"])
 
-# copy the config file to the log directory
+# copy the config file and the current model configuration to the log directory
 os.makedirs("./" + log_dir, exist_ok=True)
 shutil.copyfile("config.json", "./" + log_dir + "/config.json")
+shutil.copyfile("model.py", "./" + log_dir + "/model.py")
+# copy the config file and the current model configuration to the model directory
+os.makedirs("./" + model_dir, exist_ok=True)
+shutil.copyfile("config.json", "./" + model_dir + "/config.json")
+shutil.copyfile("model.py", "./" + model_dir + "/model.py")
 
 # create a callback to log the data for tensorboard
 tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True)
@@ -98,4 +103,4 @@ f.write("Loss: " + str(results[0]) + ", Accuracy: " + str(results[1]))
 f.close()
 
 # save the model
-model.save("model")
+model.save(log_dir + "/" + ID)
