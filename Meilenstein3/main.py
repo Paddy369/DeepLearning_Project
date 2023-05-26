@@ -2,7 +2,7 @@ import json
 import shutil
 import os
 import tensorflow as tf
-from model1 import loadModel
+from model8 import loadModel
 from datetime import datetime
 from tensorflow.keras import optimizers, losses, callbacks
 
@@ -21,7 +21,6 @@ test_batch_size = settings["batch_size_test"]           # batch size for trainin
 predict_batch_size = settings["batch_size_predict"]     # batch size for training
 image_size = settings["image_size"]                     # image size
 augmentation = settings["augmentation"]                 # is augmentation enabled
-layer_settings = settings["layers"]                     # layer configurations
 
 ################################################
 
@@ -58,6 +57,8 @@ test_batches = load_data("testing", test_batch_size)    # testing data is loaded
 # load the model
 model = loadModel()
 
+model.build(input_shape=(None, image_size, image_size, 3))
+
 # print the model summary
 model.summary()
 
@@ -82,6 +83,7 @@ model.compile(optimizer=optimizers.Adam(learning_rate=lr),
 # copy the config file to the log directory
 os.makedirs("./" + log_dir, exist_ok=True)
 shutil.copyfile("config.json", "./" + log_dir + "/config.json")
+shutil.copyfile(ID + ".py", "./" + log_dir + "/" + ID + ".py")
 
 # create a callback to log the data for tensorboard
 tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True)
@@ -98,4 +100,4 @@ f.write("Loss: " + str(results[0]) + ", Accuracy: " + str(results[1]))
 f.close()
 
 # save the model
-model.save("model")
+model.save(ID)

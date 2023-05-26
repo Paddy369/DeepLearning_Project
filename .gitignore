@@ -161,8 +161,11 @@ cython_debug/
 
 /images
 /Meilenstein*/model
+/Meilenstein*/model3
+/Meilenstein*/model4
+/Meilenstein*/model5
+/Meilenstein*/model6
+/Meilenstein*/model7
 /Meilenstein*/ergebnisse
 /Meilenstein*/logs
 /Meilenstein*/model_save
-
-solution.py
