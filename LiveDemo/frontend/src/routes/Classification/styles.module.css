@@ -1,0 +1,28 @@
+.wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+}
+
+.classificationWrapper {
+    display: flex;
+    border: 1px solid red;
+    background-color: white;
+    opacity: 0.9;
+}
+
+.inputWrapper {
+    width: 300px;
+    height: 300px;
+    border: 1px solid green;
+}
+
+.resultsWrapper {
+    width: 300px;
+    height: 300px;
+    border: 1px solid blue;
+}
+
