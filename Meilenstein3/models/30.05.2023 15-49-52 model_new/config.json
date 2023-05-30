@@ -1,6 +1,6 @@
 {
     "model_id": "model_new",
-    "batch_size_train": 32,
+    "batch_size_train": 16,
     "batch_size_val": 8,
     "batch_size_test": 8,
     "batch_size_predict": 8,

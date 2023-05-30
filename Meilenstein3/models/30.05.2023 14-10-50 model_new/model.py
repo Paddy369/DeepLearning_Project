@@ -44,9 +44,6 @@ def loadModel():
     x = block(x, 3, [256, 256, 1024], (2,2), True)
     x = block(x, 3, [256, 256, 1024])
 
-    x = block(x, 3, [512, 512, 2048], (2,2), True)
-    x = block(x, 3, [512, 512, 2048])
-
     x = AveragePooling2D((3,3))(x)
     x = Flatten() (x)
     x = Dense(15, activation='softmax') (x)
