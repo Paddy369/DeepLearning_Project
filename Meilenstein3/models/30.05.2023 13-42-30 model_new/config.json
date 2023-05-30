@@ -1,12 +1,12 @@
 {
-    "model_id": "model_noaug_lessblocks_skipping_3",
-    "batch_size_train": 4,
+    "model_id": "model_new",
+    "batch_size_train": 24,
     "batch_size_val": 4,
     "batch_size_test": 4,
     "batch_size_predict": 4,
     "epochs": 2,
     "image_size": 256,
-    "augmentation": true,
+    "augmentation": false,
     "learning_rate": {
         "decay": false,
         "initial_lr": 0.001,

@@ -1,0 +1,16 @@
+{
+    "model_id": "model_new",
+    "batch_size_train": 16,
+    "batch_size_val": 8,
+    "batch_size_test": 8,
+    "batch_size_predict": 8,
+    "epochs": 10,
+    "image_size": 256,
+    "augmentation": false,
+    "learning_rate": {
+        "decay": false,
+        "initial_lr": 0.001,
+        "steps": 2000,
+        "decay_rate": 0.96 
+    }
+}
