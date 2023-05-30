@@ -50,55 +50,58 @@ def load_data(path, batch_size):
 
 # load the data
 train_path = "train_aug" if augmentation else "train"
-train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches of 64
-val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches of 64  
-test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches of 64
+train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches
+val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches
+test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
+
+############# THIS IS AUGMENTATION BY PREPROCESSING - EXPERIMENTAL #############
+''' 
 # get the number of images in train_batches
 num_train = train_batches.cardinality().numpy() * train_batch_size
 print("Number of training images: " + str(num_train))
+AUTOTUNE = tf.data.AUTOTUNE
 
-# AUTOTUNE = tf.data.AUTOTUNE
+resize_and_rescale = tf.keras.Sequential([
+    layers.Resizing(image_size, image_size),
+    layers.Rescaling(1./255),
+    # layers.Flatten(input_shape=(None, 256,256,3))
+    # remove first dimension
+    # layers.Lambda(lambda x: tf.squeeze(x, axis=0)),
+])
 
-# resize_and_rescale = tf.keras.Sequential([
-#     layers.Resizing(image_size, image_size),
-#     layers.Rescaling(1./255),
-#     # layers.Flatten(input_shape=(None, 256,256,3))
-#     # remove first dimension
-#     # layers.Lambda(lambda x: tf.squeeze(x, axis=0)),
-# ])
+data_augmentation = tf.keras.Sequential([
+  layers.RandomFlip("horizontal_and_vertical"),
+  layers.RandomRotation(0.2),
+])
 
-# data_augmentation = tf.keras.Sequential([
-#   layers.RandomFlip("horizontal_and_vertical"),
-#   layers.RandomRotation(0.2),
-# ])
+def prepare(ds, shuffle=False, augment=False):
+  # Resize and rescale all datasets.
+  ds = ds.map(lambda x, y: (resize_and_rescale(x), y), 
+              num_parallel_calls=AUTOTUNE)
 
-# def prepare(ds, shuffle=False, augment=False):
-#   # Resize and rescale all datasets.
-#   ds = ds.map(lambda x, y: (resize_and_rescale(x), y), 
-#               num_parallel_calls=AUTOTUNE)
+  if shuffle:
+    ds = ds.shuffle(1000)
 
-#   if shuffle:
-#     ds = ds.shuffle(1000)
+  # Use data augmentation only on the training set.
+  if augment:
+    ds = ds.map(lambda x, y: (data_augmentation(x, training=True), y), 
+                num_parallel_calls=AUTOTUNE)
 
-#   # Use data augmentation only on the training set.
-#   if augment:
-#     ds = ds.map(lambda x, y: (data_augmentation(x, training=True), y), 
-#                 num_parallel_calls=AUTOTUNE)
+  # Use buffered prefetching on all datasets.
+  return ds.prefetch(buffer_size=AUTOTUNE)
 
-#   # Use buffered prefetching on all datasets.
-#   return ds.prefetch(buffer_size=AUTOTUNE)
+train_batches = prepare(train_batches, shuffle=True, augment=True)
+print("Number of training images: " + str(num_train))
 
-# train_batches = prepare(train_batches, shuffle=True, augment=True)
-# print("Number of training images: " + str(num_train))
-
-# # display augmented images
-# import matplotlib.pyplot as plt
-# for images, labels in train_batches.take(1):
-#     for i in range(9):
-#         ax = plt.subplot(3, 3, i + 1)
-#         plt.imshow(images[i].numpy().astype("uint8"))
-#         plt.title(int(labels[i]))
-#         plt.axis("off")
+# display augmented images
+import matplotlib.pyplot as plt
+for images, labels in train_batches.take(1):
+    for i in range(9):
+        ax = plt.subplot(3, 3, i + 1)
+        plt.imshow(images[i].numpy().astype("uint8"))
+        plt.title(int(labels[i]))
+        plt.axis("off")
+'''
 
 # load the model
 model = loadModel()
@@ -106,7 +109,7 @@ model = loadModel()
 model.build(input_shape=(None, image_size, image_size, 3))
 
 # print the model summary
-# model.summary()
+model.summary()
 
 # initial learning rate
 lr = settings["learning_rate"]["initial_lr"]
@@ -138,9 +141,16 @@ shutil.copyfile("model.py", "./" + model_dir + "/model.py")
 
 # create a callback to log the data for tensorboard
 tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True)
+early_stopping_callback = callbacks.EarlyStopping(monitor='val_loss', patience=10)
+
+def get_callbacks():
+  return [
+    callbacks.EarlyStopping(monitor='val_loss', patience=10),
+    callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True),
+  ]
 
 # train the model
-history = model.fit(train_batches, validation_data=val_batches, callbacks=[tensorboard_callback], epochs=epochs)
+history = model.fit(train_batches, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
 
 # evaluate the model
 results = model.evaluate(test_batches)
