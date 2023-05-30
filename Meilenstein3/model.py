@@ -33,12 +33,16 @@ def loadModel():
     x = Conv2D(64, (7, 7), strides=(2, 2))(x)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
-    x = AveragePooling2D((3, 3), strides=(3, 3))(x)
+    x = MaxPooling2D((3, 3), strides=(2, 2))(x)
 
     x = block(x, 3, [64, 64, 256], skipping=True)
     x = block(x, 3, [64, 64, 256])
-    x = block(x, 3, [256, 256, 512], (2,2), True)
+
+    x = block(x, 3, [128, 128, 512], (2,2), True)
+    x = block(x, 3, [128, 128, 512])
+
     x = block(x, 3, [256, 256, 1024], (2,2), True)
+    x = block(x, 3, [256, 256, 1024])
 
     x = block(x, 3, [512, 512, 2048], (2,2), True)
     x = block(x, 3, [512, 512, 2048])
