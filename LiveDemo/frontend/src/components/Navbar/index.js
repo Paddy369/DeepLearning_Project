@@ -1,11 +1,11 @@
 import MileStoneSelection from "../MilestoneSelection"
 import ModelSelection from "../ModelSelection"
 
-const Navbar = ({ setMilestone, setModel }) => {
+const Navbar = ({ milestone, setMilestone, model, setModel }) => {
     return (
         <div>
-            <MileStoneSelection setMilestone={setMilestone} />
-            <ModelSelection setModel={setModel} />
+            <MileStoneSelection milestone={milestone} setMilestone={setMilestone} />
+            <ModelSelection milestone={milestone} model={model} setModel={setModel} />
         </div>
     )
 }

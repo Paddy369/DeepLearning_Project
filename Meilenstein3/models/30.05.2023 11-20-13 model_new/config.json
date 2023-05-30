@@ -1,5 +1,5 @@
 {
-    "model_id": "model_aug_skipping_1",
+    "model_id": "model_new",
     "batch_size_train": 4,
     "batch_size_val": 4,
     "batch_size_test": 4,
