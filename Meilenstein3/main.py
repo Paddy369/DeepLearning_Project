@@ -4,7 +4,7 @@ import os
 import tensorflow as tf
 from model import loadModel
 from datetime import datetime
-from tensorflow.keras import optimizers, losses, callbacks
+from tensorflow.keras import layers, optimizers, losses, callbacks
 
 # load the model settings
 with open("config.json", 'r') as file:
@@ -53,6 +53,40 @@ train_path = "train_aug" if augmentation else "train"
 train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches of 64
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches of 64  
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches of 64
+
+# data_augmentation = tf.keras.Sequential([
+#   layers.RandomFlip("horizontal_and_vertical"),
+#   layers.RandomRotation(0.2),
+# ])
+
+# AUTOTUNE = tf.data.AUTOTUNE
+
+# resize_and_rescale = tf.keras.Sequential([
+#     layers.Resizing(image_size, image_size),
+#     layers.Rescaling(1./255),
+#     layers.Flatten(input_shape=(256,256,4))
+# ])
+
+# def prepare(ds, shuffle=False, augment=False):
+#   # Resize and rescale all datasets.
+#   ds = ds.map(lambda x, y: (resize_and_rescale(x), y), 
+#               num_parallel_calls=AUTOTUNE)
+
+#   if shuffle:
+#     ds = ds.shuffle(1000)
+
+#   # Batch all datasets.
+#   ds = ds.batch(train_batch_size)
+
+#   # Use data augmentation only on the training set.
+#   if augment:
+#     ds = ds.map(lambda x, y: (data_augmentation(x, training=True), y), 
+#                 num_parallel_calls=AUTOTUNE)
+
+#   # Use buffered prefetching on all datasets.
+#   return ds.prefetch(buffer_size=AUTOTUNE)
+
+# train_ds = prepare(train_batches, shuffle=True, augment=True)
 
 # load the model
 model = loadModel()
