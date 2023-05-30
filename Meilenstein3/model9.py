@@ -31,7 +31,8 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     x = BatchNormalization(axis=bn_axis)(x)
     x = Activation('relu')(x)
 
-    x = Conv2D(filters2, kernel_size, padding='same')(x)
+    x = Conv2D(filters2, kernel_size,
+               padding='same')(x)
     x = BatchNormalization(axis=bn_axis)(x)
     x = Activation('relu')(x)
 
@@ -76,7 +77,7 @@ def loadModel():
         bn_axis = 1
     img_input = Input(shape=(256, 256, 3))
     x = ZeroPadding2D((3, 3))(img_input)
-    x = Conv2D(64, (7, 7), strides=(2, 2), name='conv1')(x)
+    x = Conv2D(64, (5, 5), strides=(2, 2), name='conv1')(x)
     x = BatchNormalization(axis=bn_axis, name='bn_conv1')(x)
     x = Activation('relu')(x)
     x = MaxPooling2D((3, 3), strides=(2, 2))(x)
@@ -89,19 +90,20 @@ def loadModel():
 
     x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')
     x = identity_block(x, 3, [256, 256, 1024], stage=4, block='b')
-    
+    x = identity_block(x, 3, [256, 256, 1024], stage=4, block='c')
+
     x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a')
     x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b')
+    x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c')
+
 
     x = AveragePooling2D((7, 7), name='avg_pool')(x)
-
     x = Flatten() (x)
-    x = Dense(256, activation='relu', name='fc256') (x)   
-    x = Dropout(0.4) (x)
+    x = BatchNormalization() (x)
     x = Dense(128, activation='relu', name='fc128') (x)
-    x = Dropout(0.1) (x)
+    x = Dropout(0.4) (x)
     x = Dense(15, activation='softmax', name='fc15') (x)
 
-    model = Model(img_input, x, name='model8')
+    model = Model(img_input, x, name='model9')
 
     return model

@@ -31,7 +31,8 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     x = BatchNormalization(axis=bn_axis)(x)
     x = Activation('relu')(x)
 
-    x = Conv2D(filters2, kernel_size, padding='same')(x)
+    x = Conv2D(filters2, kernel_size,
+               padding='same')(x)
     x = BatchNormalization(axis=bn_axis)(x)
     x = Activation('relu')(x)
 
@@ -93,15 +94,15 @@ def loadModel():
     x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a')
     x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b')
 
-    x = AveragePooling2D((7, 7), name='avg_pool')(x)
+    x = conv_block(x, 3, [1024, 1024, 4096], stage=6, block='a')
+    x = identity_block(x, 3, [1024, 1024, 4096], stage=6, block='b')
+
+    x = AveragePooling2D((4, 4), name='avg_pool')(x)
 
     x = Flatten() (x)
-    x = Dense(256, activation='relu', name='fc256') (x)   
-    x = Dropout(0.4) (x)
-    x = Dense(128, activation='relu', name='fc128') (x)
-    x = Dropout(0.1) (x)
+    x = Dense(128, activation='relu', name='fc128') (x)   
     x = Dense(15, activation='softmax', name='fc15') (x)
 
-    model = Model(img_input, x, name='model8')
+    model = Model(img_input, x, name='model10')
 
     return model
