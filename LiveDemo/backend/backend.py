@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 import os
 import re
+from tensorflow.keras import models
+from predict import classify
 
 app = Flask(__name__)
 
@@ -13,11 +15,23 @@ def fetch_milestones():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-@app.route('/api/models', methods=['GET','POST','OPTIONS'])
+@app.route('/api/models', methods=['GET','OPTIONS'])
 def fetch_models():
     milestone = request.args.get('milestone')
     models = os.listdir("../../" + milestone + "/saved_models")
 
     response = jsonify(models)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/api/classify', methods=['GET','OPTIONS'])
+def fetch_results():
+    image = request.args.get('image')
+    milestone = request.args.get('milestone')
+    modelName = request.args.get('model')
+
+    results = classify(image, milestone, modelName)
+
+    response = jsonify(results)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response

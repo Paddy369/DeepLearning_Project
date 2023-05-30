@@ -11,13 +11,13 @@ const ModelSelection = ({ milestone, model, setModel }) => {
     useEffect(() => {
         async function fetchData() {
             const res = await fetchModels()
-            console.log("modelselection ", res)
             setModels(res)
-            setModel(res[0])
+            if(res.length > 0) 
+                setModel(res[0])
         }
 
         fetchData()
-    }, [])
+    }, [milestone])
     
     const fetchModels = async () => {
         const res = await fetch(`http://localhost:5000/api/models?milestone=${milestone}`)
