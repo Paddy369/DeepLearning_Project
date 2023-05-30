@@ -16,7 +16,7 @@ const Home = () => {
                 <Navbar milestone={milestone} setMilestone={setMilestone} model={model} setModel={setModel} />
                 <div className={styles.classificationWrapper}>
                     <ImageInputBox setImage={setImage} />
-                    <ResultBox />
+                    <ResultBox image={image} milestone={milestone} model={model} />
                 </div>
             </div>
         </div>
