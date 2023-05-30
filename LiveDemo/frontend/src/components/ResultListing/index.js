@@ -1,10 +1,7 @@
-import { Card, CardMedia, CardContent } from '@mui/material'
+import { Card, CardMedia, CardContent, CircularProgress, Typography } from '@mui/material'
 import styles from './styles.module.css'
 
-const ResultListing = ({ className, percentage, isMax }) => {
-
-    console.log(className, isMax)
-
+const ResultListing = ({ className, percentage, isMax, state }) => {
     return (
         <Card sx={{ display: 'flex', width: 250 }} className={`${styles.card} ${isMax && styles.max}`}>
             <CardMedia
@@ -14,8 +11,12 @@ const ResultListing = ({ className, percentage, isMax }) => {
                 alt="Cat"
             />
             <CardContent sx={{ flex: '1 0 auto' }} className={styles.contentWrapper}>
-                <h3>{className}</h3>
-                <div>Percentage: <b>{percentage}</b></div>
+                <Typography variant="h6" size="0.5rem" >{className}</Typography>
+                <div className={styles.percentageWrapper}><Typography variant="p" className={styles.percentageLabel}>Prediction:</Typography> {
+                    state == "loaded"  ? <Typography variant="p" sx={{ fontWeight: 1000 }}>{percentage}</Typography> :
+                    state == "loading" ? <CircularProgress color="grey" size="1rem" /> :
+                                         <Typography variant="p">-</Typography>
+                } </div>
             </CardContent>
         </Card>
     )

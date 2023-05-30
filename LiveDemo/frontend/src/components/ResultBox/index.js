@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import ResultListing from '../ResultListing'
 import styles from './styles.module.css'
 
-const ResultBox = ({image, milestone, model}) => {
+const ResultBox = ({image, milestone, model, state, setState}) => {
 
     const [max, setMax] = useState("")
 
@@ -21,11 +21,12 @@ const ResultBox = ({image, milestone, model}) => {
             console.log("result box ", res)
             setResults(res)
             setMax(getMax(res)[0])
+            setState(Object.keys(res).length > 0 ? "loaded" : "")
         }
 
         if(image && milestone && model)
             fetchData()
-    }, [model, milestone, image])
+    }, [image])
 
     const fetchResults = async () => {
         const res = await fetch(`http://localhost:5000/api/classify?model=${model}&milestone=${milestone}&image=${image}`)
@@ -36,7 +37,7 @@ const ResultBox = ({image, milestone, model}) => {
         <div className={styles.wrapper}>
             {
                 Object.entries(results).map(([key, value], idx) => 
-                    <ResultListing key={idx} className={key} percentage={value} isMax={max == key} />
+                    <ResultListing key={idx} className={key} percentage={value} isMax={max == key} state={state} />
                 )
             }
         </div>
