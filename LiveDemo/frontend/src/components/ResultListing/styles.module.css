@@ -1,4 +1,19 @@
 .card {
     margin-left: 20px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.contentWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.max {
+    -webkit-box-shadow: 0px 0px 12px 9px #FFA238 !important; 
+    box-shadow: 0px 0px 12px 9px #FFA238 !important;
+    /* -webkit-box-shadow: 0px 0px 12px 9px #2B9E27 !important; 
+    box-shadow: 0px 0px 12px 9px #2B9E27 !important; */
+    /* -webkit-box-shadow: 0px 0px 12px 9px #FF8000 !important; 
+    box-shadow: 0px 0px 12px 9px #FF8000 !important; */
 }
