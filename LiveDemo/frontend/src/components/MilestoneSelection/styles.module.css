@@ -1,0 +1,14 @@
+.select: {
+    &:before: {
+        borderColor: color,
+    },
+    &:after: {
+        borderColor: color,
+    }
+}, icon: {
+    fill: color,
+}
+
+.white {
+    color: white;
+}
