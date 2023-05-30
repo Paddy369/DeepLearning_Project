@@ -1,0 +1,17 @@
+.box {
+    width: 500px;
+    height: 500px;
+    border: 1px dashed #8e8e8e;
+    color: #8e8e8e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    background-size: 100%;
+    background-repeat: none;
+}
+
+.box:hover {
+    color: black;
+    border: 1px dashed black;
+}

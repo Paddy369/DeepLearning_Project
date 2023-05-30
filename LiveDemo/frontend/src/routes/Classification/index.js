@@ -6,8 +6,8 @@ import Navbar from '../../components/Navbar'
 
 const Home = () => {
 
-    const [milestone, setMilestone] = useState(null)
-    const [model, setModel] = useState(null)
+    const [milestone, setMilestone] = useState("Meilenstein3")
+    const [model, setModel] = useState("")
     const [image, setImage] = useState(null)
 
     return (

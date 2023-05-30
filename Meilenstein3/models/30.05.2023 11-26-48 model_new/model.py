@@ -30,7 +30,7 @@ def block(input_tensor, kernel_size, filters, strides=(1,1), skipping=False):
 def loadModel():
     img_input = Input(shape=(256, 256, 3))
     x = ZeroPadding2D((3, 3))(img_input)
-    x = Conv2D(64, (7, 7), strides=(2, 2))(x)
+    x = Conv2D(64, (7, 7), strides=(2, 2), name='conv1')(x)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
     x = MaxPooling2D((3, 3), strides=(2, 2))(x)

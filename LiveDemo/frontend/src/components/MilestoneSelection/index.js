@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-const MileStoneSelection = ({ setMilestone }) => {
+const MileStoneSelection = ({ milestone, setMilestone }) => {
 
     const [milestones, setMilestones] = useState([])
 
@@ -13,28 +13,27 @@ const MileStoneSelection = ({ setMilestone }) => {
             const res = await fetchMilestones()
             console.log("milestoneselection ", res)
             setMilestones(res)
-            setMilestone(res[0])
         }
 
         fetchData()
     }, [])
     
     const fetchMilestones = async () => {
-        const res = await fetch("http://localhost:5000/api/hello")
+        const res = await fetch("http://localhost:5000/api/milestones")
         return res.json()
     }
 
     const handleChange = e => {
-
+        setMilestone(e.target.value)
     }
 
     return (
         <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel id="milestoneselect">Milestone</InputLabel>
+            <InputLabel id="milestoneselectlabel">Milestone</InputLabel>
             <Select
                 labelId="milestoneselect"
                 id="milestoneselect"
-                value={milestones[0]}
+                value={milestone}
                 onChange={handleChange}
                 label="Milestone"
             >
