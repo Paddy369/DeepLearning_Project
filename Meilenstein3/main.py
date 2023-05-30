@@ -57,6 +57,8 @@ test_batches = load_data("testing", test_batch_size)    # testing data is loaded
 # load the model
 model = loadModel()
 
+model.build(input_shape=(None, image_size, image_size, 3))
+
 # print the model summary
 model.summary()
 
@@ -103,4 +105,4 @@ f.write("Loss: " + str(results[0]) + ", Accuracy: " + str(results[1]))
 f.close()
 
 # save the model
-model.save(log_dir + "/" + ID)
+model.save("saved_models/" + ID)
