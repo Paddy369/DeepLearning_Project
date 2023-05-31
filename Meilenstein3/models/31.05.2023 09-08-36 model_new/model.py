@@ -42,7 +42,7 @@ def loadModel():
     x = block(x, 3, [512, 512, 2048])
     x = block(x, 3, [512, 512, 2048])
 
-    x = block(x, 3, [1024, 10245, 4096], (2,2), True)
+    x = block(x, 3, [512, 512, 2048], (2,2), True)
 
     x = AveragePooling2D((3,3))(x)
     x = Flatten() (x)

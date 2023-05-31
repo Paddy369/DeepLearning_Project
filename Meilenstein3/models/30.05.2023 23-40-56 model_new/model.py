@@ -40,16 +40,9 @@ def loadModel():
 
     x = block(x, 3, [512, 512, 2048], (2,2), True)
     x = block(x, 3, [512, 512, 2048])
-    x = block(x, 3, [512, 512, 2048])
-
-    x = block(x, 3, [1024, 10245, 4096], (2,2), True)
 
     x = AveragePooling2D((3,3))(x)
     x = Flatten() (x)
-    x = Dense(256, activation='relu') (x)
-    x = Dropout(0.5) (x)
-    x = Dense(128, activation='relu') (x)
-    x = Dropout(0.2) (x)
     x = Dense(15, activation='softmax') (x)
 
     model = Model(img_input, x)
