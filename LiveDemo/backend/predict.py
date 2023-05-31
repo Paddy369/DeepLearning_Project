@@ -19,17 +19,21 @@ def classify(image, milestone, modelName):
     batch = np.expand_dims(img, axis=0)
 
     # load the model
-    model = models.load_model('../../' + milestone + '/saved_models/' + modelName)
-
-    # predict the results
-    predict = model.predict(batch)
-    mappedPredictions = mapPredictions(predict)
+    try:
+        # load the model
+        model = models.load_model('../../' + milestone + '/saved_models/' + modelName)
+        # predict the results
+        predict = model.predict(batch)
+        # map the predictions to the class names
+        result = mapPredictions(predict)
+    except:
+        result = []
 
     # remove the image from the demo directory
     os.remove("./demo/" + image)
 
     # return the prediction
-    return mappedPredictions
+    return result
 
 # maps the predictions to the class names
 def mapPredictions(predictions):

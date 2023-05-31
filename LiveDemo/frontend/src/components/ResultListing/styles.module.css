@@ -17,3 +17,12 @@
     /* -webkit-box-shadow: 0px 0px 12px 9px #FF8000 !important; 
     box-shadow: 0px 0px 12px 9px #FF8000 !important; */
 }
+
+.percentageWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.percentageLabel {
+    margin-right: 5px !important;
+}
