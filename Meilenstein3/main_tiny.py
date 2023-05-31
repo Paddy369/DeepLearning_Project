@@ -35,11 +35,7 @@ def load_data(path, batch_size):
                       "Cow", "Dog", "Elephant", 
                       "Gorilla", "Hippo", "Lizard", 
                       "Monkey", "Mouse", "Panda", 
-<<<<<<< HEAD
                       "Spider", "Tiger", "Zebra"],     # names of the classes      
-=======
-                      "Spider", "Tiger", "Zebra"],           
->>>>>>> 347be550f2876a6a5014519f08df081a6d5f1b56
         color_mode="rgb",                               # color images
         batch_size = batch_size,                        # number of images to retrieve at a time
         image_size=(image_size, image_size),            # images are resized to 256x256
