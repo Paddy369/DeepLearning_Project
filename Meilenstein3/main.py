@@ -4,7 +4,7 @@ import os
 import tensorflow as tf
 from model import loadModel
 from datetime import datetime
-from tensorflow.keras import layers, optimizers, losses, callbacks
+from tensorflow.keras import optimizers, losses, callbacks
 
 # load the model settings
 with open("config.json", 'r') as file:
@@ -138,6 +138,8 @@ shutil.copyfile("model.py", "./" + log_dir + "/model.py")
 os.makedirs("./" + model_dir, exist_ok=True)
 shutil.copyfile("config.json", "./" + model_dir + "/config.json")
 shutil.copyfile("model.py", "./" + model_dir + "/model.py")
+# create a directory for the saved models
+os.makedirs("./saved_models", exist_ok=True)
 
 # create a callback to log the data for tensorboard
 tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True)

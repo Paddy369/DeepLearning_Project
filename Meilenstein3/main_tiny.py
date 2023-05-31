@@ -35,7 +35,11 @@ def load_data(path, batch_size):
                       "Cow", "Dog", "Elephant", 
                       "Gorilla", "Hippo", "Lizard", 
                       "Monkey", "Mouse", "Panda", 
+<<<<<<< HEAD
                       "Spider", "Tiger", "Zebra"],     # names of the classes      
+=======
+                      "Spider", "Tiger", "Zebra"],           
+>>>>>>> 347be550f2876a6a5014519f08df081a6d5f1b56
         color_mode="rgb",                               # color images
         batch_size = batch_size,                        # number of images to retrieve at a time
         image_size=(image_size, image_size),            # images are resized to 256x256
@@ -68,6 +72,7 @@ lr = settings["learning_rate"]["initial_lr"]
 # path to the log directory and the model directory
 now = datetime.now()
 log_dir = "logs/" + now.strftime("%d.%m.%Y %H-%M-%S ") + str(ID)        # for our tensorboard logs and the related model configuration
+model_dir = "models/" + now.strftime("%d.%m.%Y %H-%M-%S ") + str(ID)     # for transparancy reasons (wird mit ins repo eingecheckt)
 
 if settings["learning_rate"]["decay"] == True:
     lr = optimizers.schedules.InverseTimeDecay(lr, 
@@ -81,10 +86,14 @@ model.compile(optimizer=optimizers.Adam(learning_rate=lr),
             loss=losses.SparseCategoricalCrossentropy(),
                 metrics=["accuracy"])
 
-# # copy the config file and the current model configuration to the log directory
-# os.makedirs("./" + log_dir, exist_ok=True)
-# shutil.copyfile("config.json", "./" + log_dir + "/config.json")
-# shutil.copyfile("model.py", "./" + log_dir + "/model.py")
+# copy the config file and the current model configuration to the log directory
+os.makedirs("./" + log_dir, exist_ok=True)
+shutil.copyfile("config.json", "./" + log_dir + "/config.json")
+shutil.copyfile("model_tiny.py", "./" + log_dir + "/model.py")
+# copy the config file and the current model configuration to the model directory
+os.makedirs("./" + model_dir, exist_ok=True)
+shutil.copyfile("config.json", "./" + model_dir + "/config.json")
+shutil.copyfile("model_tiny.py", "./" + model_dir + "/model.py")
 
 # create a callback to log the data for tensorboard
 # tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True)

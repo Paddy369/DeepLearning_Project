@@ -18,7 +18,6 @@ def classify(image, milestone, modelName):
     # create batch from image
     batch = np.expand_dims(img, axis=0)
 
-    # load the model
     try:
         # load the model
         model = models.load_model('../../' + milestone + '/saved_models/' + modelName)
