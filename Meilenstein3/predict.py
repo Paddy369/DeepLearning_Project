@@ -1,16 +1,16 @@
 import json
-import shutil
-import os
 import tensorflow as tf
 from datetime import datetime
-from tensorflow.keras import layers, Sequential, optimizers, losses, callbacks
+import pandas as pd
+from IPython.display import display
 
-BASE_DIR = 'images'
+BASE_DIR = '../images'
 names = ["Beetle", "Butterfly", "Cat", "Cow", "Dog", "Elephant", "Gorilla", "Hippo", "Lizard", "Monkey", "Mouse", "Panda", "Spider", "Tiger", "Zebra"]
+imageCount = [100, 100, 394, 177, 88, 306, 30, 57, 95, 184, 100, 237, 100, 164, 270]
 
 # load the data
 predict_batches = tf.keras.utils.image_dataset_from_directory (
-    BASE_DIR + '/predict',
+    BASE_DIR + '/testing',
     labels="inferred",
     label_mode="int",
     class_names=None,
@@ -27,10 +27,43 @@ predict_batches = tf.keras.utils.image_dataset_from_directory (
 )
 
 # load the tensorflow model
-model = tf.keras.models.load_model('model_save')
+model = tf.keras.models.load_model('saved_models/model')
 
-model.summary()
+# model.summary()
 
+# predict the results
 predict = model.predict(predict_batches)
+# get dominant class
 predict = tf.argmax(predict, axis=1)
-print(predict)
+
+results = {}
+
+# create dictionary for dominant classes and their count
+idx = 0
+# iterate over all classes
+for i in range(0, len(imageCount)):
+    # create dictionary for dominant classes and their count for the current class
+    results[names[i]] = {}
+    # iterate over all images of the current class
+    for j in range(0, imageCount[i]):
+        # get the class name of the current image
+        className = names[predict[idx]]
+        # if the class name is already in the dictionary, increment the count 
+        if className in results[names[i]]:
+            results[names[i]][className] += 1
+        # else add the class name to the dictionary
+        else:
+            results[names[i]][className] = 1
+        idx += 1
+
+# Serializing json
+json_object = json.dumps(results, indent=4)
+ 
+# Writing to prediction.json
+with open("prediction.json", "w") as outfile:
+    outfile.write(json_object)
+
+pd_object = pd.read_json('prediction.json', typ='series')
+df = pd.DataFrame(pd_object)
+display(df)
+
