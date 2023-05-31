@@ -168,3 +168,5 @@ cython_debug/
 /Meilenstein*/logs
 /Meilenstein*/model_save
 /Meilenstein*/saved_models
+/Meilenstein3/model7.py
+/Meilenstein3/main2.py

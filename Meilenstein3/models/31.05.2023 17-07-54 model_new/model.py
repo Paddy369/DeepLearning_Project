@@ -6,18 +6,19 @@ import keras.backend as K
 from keras.regularizers import l1, l2, l1_l2
 
 def block(input_tensor, kernel_size, filters, strides=(1,1), skipping=False):
-    filters2, filters3 = filters
+    filters1, filters2, filters3 = filters
     if K.image_data_format() == 'channels_last':
         bn_axis = 3
     else:
         bn_axis = 1
+    img_input = Input(shape=(256, 256, 3))
 
-    # x = Conv2D(filters1, (1, 1), strides=strides)(input_tensor)
-    # x = BatchNormalization(axis=bn_axis)(x)
-    # x = Activation('relu')(x)
+    x = Conv2D(filters1, (1, 1), strides=strides)(input_tensor)
+    x = BatchNormalization(axis=bn_axis)(x)
+    x = Activation('relu')(x)
 
     x = Conv2D(filters2, kernel_size,
-               padding='same', strides=strides)(input_tensor)
+               padding='same')(x)
     x = BatchNormalization(axis=bn_axis)(x)
     x = Activation('relu')(x)
 
@@ -48,11 +49,11 @@ def loadModel():
     # x = block(x, 3, [64, 64, 128], (2,2), True)
     # x = block(x, 3, [64, 64, 128])
 
-    x = block(x, 3, [128, 256], (2,2), True)
-    x = block(x, 3, [128, 256])
+    x = block(x, 3, [128, 128, 256], (2,2), True)
+    x = block(x, 3, [128, 128, 256])
 
-    x = block(x, 3, [256, 512], (2,2), True)
-    x = block(x, 3, [256, 512])
+    x = block(x, 3, [256, 256, 512], (2,2), True)
+    x = block(x, 3, [256, 256, 512])
     # x = block(x, 5, [256, 256, 512], (2,2), True)
     
     x = AveragePooling2D((3,3))(x)

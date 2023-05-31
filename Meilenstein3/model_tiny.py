@@ -11,5 +11,5 @@ def loadModel():
     model.add(layers.Flatten())
     # model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(64, activation='relu'))
-    model.add(layers.Dense(3, activation='softmax'))
+    model.add(layers.Dense(15, activation='softmax'))
     return model

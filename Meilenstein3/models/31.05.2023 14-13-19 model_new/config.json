@@ -1,6 +1,6 @@
 {
-    "model_id": "model_new3",
-    "batch_size_train": 26,
+    "model_id": "model_new",
+    "batch_size_train": 32,
     "batch_size_val": 4,
     "batch_size_test": 4,
     "batch_size_predict": 4,
@@ -10,7 +10,7 @@
     "learning_rate": {
         "decay": true,
         "initial_lr": 0.001,
-        "steps": 1500,
+        "steps": 2000,
         "decay_rate": 0.96
     }
 }
