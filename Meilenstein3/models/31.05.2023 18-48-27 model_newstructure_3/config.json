@@ -1,5 +1,5 @@
 {
-    "model_id": "model_newstructure_5_more-wd_vslr",
+    "model_id": "model_newstructure_3",
     "batch_size_train": 64,
     "batch_size_val": 64,
     "batch_size_test": 64,
@@ -9,7 +9,7 @@
     "augmentation": false,
     "learning_rate": {
         "decay": true,
-        "initial_lr": 0.00005,
+        "initial_lr": 0.0001,
         "steps": 2000,
         "decay_rate": 0.96
     }

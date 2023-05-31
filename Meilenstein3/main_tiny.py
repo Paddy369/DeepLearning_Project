@@ -13,7 +13,7 @@ with open("config_tiny.json", 'r') as file:
 ################### SETTINGS ###################
 
 ID = settings["model_id"]                               # id of the model
-BASE_DIR = "../images_tiny/"                            # base directory
+BASE_DIR = "../images/"                            # base directory
 epochs = settings["epochs"]                             # number of epochs
 train_batch_size = settings["batch_size_train"]         # batch size for training
 val_batch_size = settings["batch_size_val"]             # batch size for training
@@ -31,7 +31,11 @@ def load_data(path, batch_size):
         BASE_DIR + path,                                # path to the data directory
         labels="inferred",                              # class labels are inferred from the subdirectory structure
         label_mode="int",                               # labels are returned as integers
-        class_names= ["Beetle", "Cat", "Elephant"],     # names of the classes      
+        class_names= ["Beetle", "Butterfly", "Cat",     # names of the classes
+                      "Cow", "Dog", "Elephant", 
+                      "Gorilla", "Hippo", "Lizard", 
+                      "Monkey", "Mouse", "Panda", 
+                      "Spider", "Tiger", "Zebra"],           
         color_mode="rgb",                               # color images
         batch_size = batch_size,                        # number of images to retrieve at a time
         image_size=(image_size, image_size),            # images are resized to 256x256
@@ -64,6 +68,7 @@ lr = settings["learning_rate"]["initial_lr"]
 # path to the log directory and the model directory
 now = datetime.now()
 log_dir = "logs/" + now.strftime("%d.%m.%Y %H-%M-%S ") + str(ID)        # for our tensorboard logs and the related model configuration
+model_dir = "models/" + now.strftime("%d.%m.%Y %H-%M-%S ") + str(ID)     # for transparancy reasons (wird mit ins repo eingecheckt)
 
 if settings["learning_rate"]["decay"] == True:
     lr = optimizers.schedules.InverseTimeDecay(lr, 
@@ -80,7 +85,11 @@ model.compile(optimizer=optimizers.Adam(learning_rate=lr),
 # copy the config file and the current model configuration to the log directory
 os.makedirs("./" + log_dir, exist_ok=True)
 shutil.copyfile("config.json", "./" + log_dir + "/config.json")
-shutil.copyfile("model.py", "./" + log_dir + "/model.py")
+shutil.copyfile("model_tiny.py", "./" + log_dir + "/model.py")
+# copy the config file and the current model configuration to the model directory
+os.makedirs("./" + model_dir, exist_ok=True)
+shutil.copyfile("config.json", "./" + model_dir + "/config.json")
+shutil.copyfile("model_tiny.py", "./" + model_dir + "/model.py")
 
 # create a callback to log the data for tensorboard
 # tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True)

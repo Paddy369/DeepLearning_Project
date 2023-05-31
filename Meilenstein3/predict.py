@@ -6,7 +6,7 @@ from IPython.display import display
 
 BASE_DIR = '../images'
 names = ["Beetle", "Butterfly", "Cat", "Cow", "Dog", "Elephant", "Gorilla", "Hippo", "Lizard", "Monkey", "Mouse", "Panda", "Spider", "Tiger", "Zebra"]
-imageCount = [100, 100, 394, 177, 88, 306, 30, 57, 95, 184, 100, 237, 100, 164, 270]
+imageCount = [100, 100, 379, 174, 87, 299, 28, 57, 93, 183, 93, 233, 98, 160, 263]
 
 # load the data
 predict_batches = tf.keras.utils.image_dataset_from_directory (
