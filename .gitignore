@@ -168,4 +168,3 @@ cython_debug/
 /Meilenstein*/logs
 /Meilenstein*/model_save
 /Meilenstein*/saved_models
-/Meilenstein*/config_tiny.json
