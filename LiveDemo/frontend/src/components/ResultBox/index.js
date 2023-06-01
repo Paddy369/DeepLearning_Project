@@ -4,6 +4,8 @@ import styles from './styles.module.css'
 
 const ResultBox = ({image, milestone, model, state, setState}) => {
 
+    console.log("box called")
+
     const [max, setMax] = useState("")
 
     const [results, setResults] = useState({
@@ -16,6 +18,7 @@ const ResultBox = ({image, milestone, model, state, setState}) => {
     }
 
     useEffect(() => {
+        console.log("effect called")
         async function fetchData() {
             const res = await fetchResults()
             console.log("result box ", res)

@@ -14,6 +14,7 @@ def classify(image, milestone, modelName):
 
     # load the image
     img = cv2.imread("./demo/" + image)
+    img = cv2.resize(img, (256, 256))
 
     # create batch from image
     batch = np.expand_dims(img, axis=0)
