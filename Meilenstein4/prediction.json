@@ -1,0 +1,160 @@
+{
+    "Beetle": {
+        "Spider": 17,
+        "Beetle": 74,
+        "Monkey": 1,
+        "Butterfly": 4,
+        "Tiger": 2,
+        "Panda": 1,
+        "Gorilla": 1
+    },
+    "Butterfly": {
+        "Butterfly": 65,
+        "Spider": 15,
+        "Lizard": 7,
+        "Monkey": 1,
+        "Beetle": 4,
+        "Dog": 1,
+        "Elephant": 1,
+        "Mouse": 4,
+        "Cat": 1,
+        "Tiger": 1
+    },
+    "Cat": {
+        "Cat": 250,
+        "Cow": 11,
+        "Panda": 2,
+        "Tiger": 6,
+        "Spider": 17,
+        "Monkey": 10,
+        "Dog": 29,
+        "Hippo": 2,
+        "Mouse": 45,
+        "Gorilla": 5,
+        "Butterfly": 2
+    },
+    "Cow": {
+        "Cow": 132,
+        "Cat": 3,
+        "Dog": 17,
+        "Elephant": 8,
+        "Spider": 1,
+        "Mouse": 2,
+        "Monkey": 3,
+        "Hippo": 3,
+        "Gorilla": 2,
+        "Panda": 2,
+        "Tiger": 1
+    },
+    "Dog": {
+        "Elephant": 2,
+        "Dog": 77,
+        "Cat": 2,
+        "Hippo": 2,
+        "Butterfly": 1,
+        "Monkey": 1,
+        "Cow": 1,
+        "Mouse": 1
+    },
+    "Elephant": {
+        "Elephant": 249,
+        "Dog": 6,
+        "Tiger": 4,
+        "Spider": 6,
+        "Monkey": 6,
+        "Hippo": 10,
+        "Cow": 10,
+        "Gorilla": 4,
+        "Mouse": 2,
+        "Butterfly": 1,
+        "Cat": 1
+    },
+    "Gorilla": {
+        "Monkey": 3,
+        "Gorilla": 25
+    },
+    "Hippo": {
+        "Cow": 3,
+        "Hippo": 46,
+        "Monkey": 2,
+        "Panda": 1,
+        "Elephant": 3,
+        "Mouse": 1,
+        "Cat": 1
+    },
+    "Lizard": {
+        "Butterfly": 7,
+        "Lizard": 53,
+        "Spider": 15,
+        "Tiger": 2,
+        "Gorilla": 1,
+        "Mouse": 4,
+        "Beetle": 4,
+        "Cat": 1,
+        "Zebra": 1,
+        "Dog": 1,
+        "Monkey": 3,
+        "Elephant": 1
+    },
+    "Monkey": {
+        "Gorilla": 3,
+        "Monkey": 142,
+        "Panda": 1,
+        "Cat": 2,
+        "Dog": 17,
+        "Spider": 7,
+        "Mouse": 7,
+        "Cow": 2,
+        "Hippo": 1,
+        "Tiger": 1
+    },
+    "Mouse": {
+        "Mouse": 68,
+        "Spider": 8,
+        "Dog": 5,
+        "Monkey": 3,
+        "Gorilla": 3,
+        "Lizard": 1,
+        "Panda": 2,
+        "Cow": 1,
+        "Tiger": 2
+    },
+    "Panda": {
+        "Panda": 218,
+        "Mouse": 2,
+        "Monkey": 4,
+        "Dog": 4,
+        "Gorilla": 2,
+        "Cat": 1,
+        "Spider": 2
+    },
+    "Spider": {
+        "Spider": 81,
+        "Tiger": 2,
+        "Beetle": 3,
+        "Mouse": 3,
+        "Butterfly": 4,
+        "Lizard": 2,
+        "Cat": 1,
+        "Monkey": 2
+    },
+    "Tiger": {
+        "Tiger": 152,
+        "Mouse": 2,
+        "Cow": 1,
+        "Monkey": 2,
+        "Spider": 1,
+        "Gorilla": 1,
+        "Hippo": 1
+    },
+    "Zebra": {
+        "Zebra": 245,
+        "Dog": 1,
+        "Lizard": 3,
+        "Cow": 2,
+        "Tiger": 8,
+        "Spider": 2,
+        "Butterfly": 1,
+        "Panda": 1
+    }
+}

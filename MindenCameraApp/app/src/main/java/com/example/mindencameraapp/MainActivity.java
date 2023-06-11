@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
 
     private Interpreter tflite;
     // add your filename here (label names)
-    final String CLASSIFIER_LABEL_File = "labels_mobilenet_quant_v1_224.txt";
+    final String CLASSIFIER_LABEL_File = "labels_model_new4_1.txt";
     // add your filename here (model file)
-    final String TF_LITE_File = "mobilenet_v1_1.0_224_quant.tflite";
+    final String TF_LITE_File = "model_new4_1.tflite";
     List<String> clasifierLabels = null;
 
 
@@ -295,19 +295,19 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
         int height = bitmapImage.getHeight();
         Log.d("classifySingleImage", "(width,height): " + width + " " + height);
 
-        // image size set to 224x224 (use bilinear interpolation)
+        // image size set to 256x256 (use bilinear interpolation)
         int size = height > width ? width : height;
         ImageProcessor imageProcessor = new ImageProcessor.Builder()
                 .add(new Rot90Op(1))
                 .add(new ResizeWithCropOrPadOp(size, size))
-                .add(new ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
+                .add(new ResizeOp(256, 256, ResizeOp.ResizeMethod.BILINEAR))
                 .build();
 
         TensorImage tensorImage = new TensorImage(DataType.UINT8);
         tensorImage.load(bitmapImage);
         tensorImage = imageProcessor.process(tensorImage);
         TensorBuffer probabilityBuffer =
-                TensorBuffer.createFixedSize(new int[]{1, 1001}, DataType.UINT8);
+                TensorBuffer.createFixedSize(new int[]{1, 15}, DataType.UINT8);
 
         if(null != tflite) {
             tflite.run(tensorImage.getBuffer(), probabilityBuffer.getBuffer());
@@ -372,18 +372,18 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
             int height = bitmapImage.getHeight();
 
             int size = height > width ? width : height;
-            // image size set to 224x224 (use bilinear interpolation)
+            // image size set to 256x256 (use bilinear interpolation)
             ImageProcessor imageProcessor = new ImageProcessor.Builder()
                     .add(new Rot90Op(1))
                     .add(new ResizeWithCropOrPadOp(size, size))
-                    .add(new ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
+                    .add(new ResizeOp(256, 256, ResizeOp.ResizeMethod.BILINEAR))
                     .build();
 
-            TensorImage tensorImage = new TensorImage(DataType.UINT8);
+            TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
             tensorImage.load(bitmapImage);
             tensorImage = imageProcessor.process(tensorImage);
             TensorBuffer probabilityBuffer =
-                    TensorBuffer.createFixedSize(new int[]{1, 1001}, DataType.UINT8);
+                    TensorBuffer.createFixedSize(new int[]{1, 15}, DataType.FLOAT32);
 
             if(null != tflite) {
                 tflite.run(tensorImage.getBuffer(), probabilityBuffer.getBuffer());
