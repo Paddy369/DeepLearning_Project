@@ -303,17 +303,17 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                 .add(new ResizeOp(256, 256, ResizeOp.ResizeMethod.BILINEAR))
                 .build();
 
-        TensorImage tensorImage = new TensorImage(DataType.UINT8);
+        TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
         tensorImage.load(bitmapImage);
         tensorImage = imageProcessor.process(tensorImage);
         TensorBuffer probabilityBuffer =
-                TensorBuffer.createFixedSize(new int[]{1, 15}, DataType.UINT8);
+                TensorBuffer.createFixedSize(new int[]{1, 15}, DataType.FLOAT32);
 
         if(null != tflite) {
             tflite.run(tensorImage.getBuffer(), probabilityBuffer.getBuffer());
         }
         TensorProcessor probabilityProcessor =
-                new TensorProcessor.Builder().add(new NormalizeOp(0, 255)).build();
+                new TensorProcessor.Builder()/*.add(new NormalizeOp(0, 255))*/.build();
 
         String resultString = " ";
         if (null != clasifierLabels) {
@@ -389,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                 tflite.run(tensorImage.getBuffer(), probabilityBuffer.getBuffer());
             }
             TensorProcessor probabilityProcessor =
-                    new TensorProcessor.Builder().add(new NormalizeOp(0, 255)).build();
+                    new TensorProcessor.Builder()/*.add(new NormalizeOp(0, 255))*/.build();
 
             String resultString = " ";
             if (null != clasifierLabels) {
