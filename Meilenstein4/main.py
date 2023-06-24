@@ -57,107 +57,18 @@ train_batches = load_data(train_path, train_batch_size) # training data is loade
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
 
-############# THIS IS AUGMENTATION BY PREPROCESSING - EXPERIMENTAL #############
-''' 
-# get the number of images in train_batches
-num_train = train_batches.cardinality().numpy() * train_batch_size
-print("Number of training images: " + str(num_train))
-AUTOTUNE = tf.data.AUTOTUNE
-
-resize_and_rescale = tf.keras.Sequential([
-    layers.Resizing(image_size, image_size),
-    layers.Rescaling(1./255),
-    # layers.Flatten(input_shape=(None, 256,256,3))
-    # remove first dimension
-    # layers.Lambda(lambda x: tf.squeeze(x, axis=0)),
-])
-
-data_augmentation = tf.keras.Sequential([
-  layers.RandomFlip("horizontal_and_vertical"),
-  layers.RandomRotation(0.2),
-])
-
-def prepare(ds, shuffle=False, augment=False):
-  # Resize and rescale all datasets.
-  ds = ds.map(lambda x, y: (resize_and_rescale(x), y), 
-              num_parallel_calls=AUTOTUNE)
-
-  if shuffle:
-    ds = ds.shuffle(1000)
-
-  # Use data augmentation only on the training set.
-  if augment:
-    ds = ds.map(lambda x, y: (data_augmentation(x, training=True), y), 
-                num_parallel_calls=AUTOTUNE)
-
-  # Use buffered prefetching on all datasets.
-  return ds.prefetch(buffer_size=AUTOTUNE)
-
-train_batches = prepare(train_batches, shuffle=True, augment=True)
-print("Number of training images: " + str(num_train))
-
-# display augmented images
-import matplotlib.pyplot as plt
-for images, labels in train_batches.take(1):
-    for i in range(9):
-        ax = plt.subplot(3, 3, i + 1)
-        plt.imshow(images[i].numpy().astype("uint8"))
-        plt.title(int(labels[i]))
-        plt.axis("off")
-'''
-
-# Optimization
-
-train_batches = (
-    train_batches
-    .cache()
-    # .batch(train_batch_size)
-    # .repeat()
-    .prefetch(tf.data.AUTOTUNE)
-    .interleave(
-        lambda x, y: tf.data.Dataset.from_tensor_slices((x,y)).shuffle(1000).batch(train_batch_size),
-        cycle_length=4,
-        block_length=16,
-        num_parallel_calls=tf.data.AUTOTUNE
-    )
-)
-
-# val_batches = (
-#     val_batches
-#     # .cache()
-#     .batch(val_batch_size)
-#     # .repeat()
-#     # .prefetch(tf.data.AUTOTUNE)
-# )
-
-# test_batches = (
-#     test_batches
-#     # .cache()
-#     .batch(test_batch_size)
-#     # .repeat()
-#     # .prefetch(tf.data.AUTOTUNE)
-# )
-
-# train_batches = train_batches.cache()
-# train_batches = train_batches.prefetch(tf.data.AUTOTUNE)
-# val_batches = val_batches.cache()
-# val_batches = val_batches.prefetch(tf.data.AUTOTUNE)
-# test_batches = test_batches.cache()
-# test_batches = test_batches.prefetch(tf.data.AUTOTUNE)
-
-# Equivalent to the two lines above
-# policy = mixed_precision.Policy('mixed_float16')
-# mixed_precision.set_global_policy(policy)
-# print('Compute dtype: %s' % policy.compute_dtype)
-# print('Variable dtype: %s' % policy.variable_dtype)
-
-
 # load the model
-model = tf.keras.models.load_model("saved_models/model_ms3")
-model.build(input_shape=(None, image_size, image_size, 3))
+teacher_model = tf.keras.models.load_model("saved_models/model_ms3")
+teacher_model.build(input_shape=(None, image_size, image_size, 3))
+
+for layer in teacher_model.layers:
+    layer.trainable = False
+
+student_model = loadModel()
+student_model.build(input_shape=(None, image_size, image_size, 3))
 
 # print the model summary
-model.summary()
+student_model.summary()
 
 # initial learning rate
 lr = settings["learning_rate"]["initial_lr"]
@@ -172,10 +83,20 @@ if settings["learning_rate"]["decay"] == True:
         decay_steps=settings["learning_rate"]["steps"], 
         decay_rate=settings["learning_rate"]["decay_rate"], 
         staircase=False, name=None)
+    
+student_loss_fn = losses.SparseCategoricalCrossentropy(from_logits=True)
+student_loss = student_loss_fn(y_teacher, y_student)
+
+temp = 5
+def distillation_loss(y_teacher, y_student):
+    distillation_loss_fn = tf.keras.losses.KLDivergence()
+    y_teacher = tf.nn.softmax(y_teacher/temp)
+    y_student = tf.nn.softmax(y_student/temp)
+    return distillation_loss_fn(y_teacher, y_student)
 
 # compile the model
-model.compile(optimizer=optimizers.Adam(learning_rate=lr),
-            loss=losses.SparseCategoricalCrossentropy(),
+student_model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+            loss=total_loss,
             metrics=["accuracy"])
 
 # copy the config file and the current model configuration to the log directory
@@ -200,10 +121,10 @@ def get_callbacks():
   ]
 
 # train the model
-history = model.fit(train_batches, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
+history = student_model.fit(train_batches, validation_data=val_batches, teacher_model.predict(train_batches), callbacks=get_callbacks(), epochs=epochs)
 
 # evaluate the model
-results = model.evaluate(test_batches)
+results = student_model.evaluate(test_batches)
 
 # save the test results
 f = open(log_dir + "/test_results.txt", "a")
@@ -211,4 +132,4 @@ f.write("Loss: " + str(results[0]) + ", Accuracy: " + str(results[1]))
 f.close()
 
 # save the model
-model.save("saved_models/" + ID)
+student_model.save("saved_models/" + ID)
