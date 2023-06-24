@@ -5,6 +5,7 @@ import tensorflow as tf
 from model import loadModel
 from datetime import datetime
 from tensorflow.keras import optimizers, losses, callbacks, mixed_precision
+from tensorflow.data.experimental import AUTOTUNE
 
 # load the model settings
 with open("config.json", 'r') as file:
@@ -23,6 +24,21 @@ image_size = settings["image_size"]                     # image size
 augmentation = settings["augmentation"]                 # is augmentation enabled
 
 ################################################
+
+def load(file_path):
+    img = tf.io.read_file(file_path)
+    img = tf.image.decode_jpeg(img, channels=3)
+    
+    ... # do some preprocessing like resizing if necessary
+
+    return img
+
+def load_data_from_path(path):
+    list_ds = tf.data.Dataset.list_files(str('<YOUR PATH INCL. REGEX>'), shuffle=True)  # Get all images from subfolders
+    train_dataset = list_ds.take(-1)
+    # Set `num_parallel_calls` so multiple images are loaded/processed in parallel.
+    train_dataset = train_dataset.map(load, num_parallel_calls=AUTOTUNE)
+    return train_dataset
 
 # loads the data for a given path
 def load_data(path, batch_size):
@@ -58,8 +74,9 @@ val_batches = load_data("validation", val_batch_size)   # validation data is loa
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
 
 # load the model
-teacher_model = tf.keras.models.load_model("saved_models/model_ms3")
+teacher_model = tf.keras.models.load_model("saved_models/model_new4_1")
 teacher_model.build(input_shape=(None, image_size, image_size, 3))
+teacher_prediction = teacher_model.predict(train_batches)
 
 for layer in teacher_model.layers:
     layer.trainable = False
@@ -83,16 +100,22 @@ if settings["learning_rate"]["decay"] == True:
         decay_steps=settings["learning_rate"]["steps"], 
         decay_rate=settings["learning_rate"]["decay_rate"], 
         staircase=False, name=None)
-    
-student_loss_fn = losses.SparseCategoricalCrossentropy(from_logits=True)
-student_loss = student_loss_fn(y_teacher, y_student)
 
-temp = 5
+def student_loss(y_teacher, y_student):
+    student_loss_fn = losses.SparseCategoricalCrossentropy(from_logits=True)
+    student_loss = student_loss_fn(y_teacher, y_student)
+    return student_loss
+
 def distillation_loss(y_teacher, y_student):
+    temp = 5
     distillation_loss_fn = tf.keras.losses.KLDivergence()
     y_teacher = tf.nn.softmax(y_teacher/temp)
     y_student = tf.nn.softmax(y_student/temp)
     return distillation_loss_fn(y_teacher, y_student)
+
+def total_loss(y_teacher, y_student):
+    alpha = 0.1
+    return alpha * student_loss(y_teacher, y_student) + (1 - alpha) * distillation_loss(y_teacher, y_student)
 
 # compile the model
 student_model.compile(optimizer=optimizers.Adam(learning_rate=lr),
@@ -121,7 +144,7 @@ def get_callbacks():
   ]
 
 # train the model
-history = student_model.fit(train_batches, validation_data=val_batches, teacher_model.predict(train_batches), callbacks=get_callbacks(), epochs=epochs)
+history = student_model.fit(train_batches, teacher_prediction, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
 
 # evaluate the model
 results = student_model.evaluate(test_batches)
