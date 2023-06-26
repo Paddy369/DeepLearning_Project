@@ -1,10 +1,8 @@
 import json
 import shutil
 import os
-import sys
 import tensorflow as tf
-import numpy as np
-from model import loadModel
+from model_student import loadModel
 from datetime import datetime
 from tensorflow.keras import optimizers, losses, callbacks, mixed_precision, metrics
 from tensorflow.data.experimental import AUTOTUNE
@@ -53,20 +51,14 @@ def load_data(path, batch_size, label_mode="int"):
     )
 
 # load the data
-train_path = "train_aug" if augmentation else "testing"
+train_path = "train_aug" if augmentation else "train"
 train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
 
-# load the model
+# load the teacher and the student model
 teacher_model = tf.keras.models.load_model("saved_models/model_new4_1")
 teacher_model.build(input_shape=(None, image_size, image_size, 3))
-teacher_prediction = teacher_model.predict(train_batches)
-teacher_prediction = tf.argmax(teacher_prediction, axis=1)
-
-for layer in teacher_model.layers:
-    layer.trainable = False
-
 student_model = loadModel()
 student_model.build(input_shape=(None, image_size, image_size, 3))
 
@@ -90,7 +82,7 @@ if settings["learning_rate"]["decay"] == True:
 # compile the model
 distiller = Distiller(teacher=teacher_model, student=student_model)
 distiller.compile(
-    optimizer=optimizers.Adam(),
+    optimizer=optimizers.Adam(learning_rate=lr),
     metrics=[metrics.SparseCategoricalAccuracy()],
     student_loss_fn=losses.SparseCategoricalCrossentropy(),
     distillation_loss_fn=losses.KLDivergence(),
@@ -121,7 +113,6 @@ def get_callbacks():
 
 # train the model
 history = distiller.fit(train_batches, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
-# history = student_model.fit(x_train, teacher_prediction, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
 
 # evaluate the model
 results = distiller.evaluate(test_batches)
