@@ -9,10 +9,10 @@ model = tf.keras.models.load_model("saved_models/model_new4_1")
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
 
 # # optimize the model
-# converter.optimizations = [tf.lite.Optimize.DEFAULT]
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
 # # quantize the model
-# converter.target_spec.supported_types = [tf.float16]
+converter.target_spec.supported_types = [tf.float16]
 
 # convert the model
 tflite_model = converter.convert()
