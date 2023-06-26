@@ -2,6 +2,7 @@ import json
 import shutil
 import os
 import tensorflow as tf
+import numpy as np
 from model import loadModel
 from datetime import datetime
 from tensorflow.keras import optimizers, losses, callbacks, mixed_precision
@@ -25,38 +26,20 @@ augmentation = settings["augmentation"]                 # is augmentation enable
 
 ################################################
 
-def load(file_path):
-    img = tf.io.read_file(file_path)
-    img = tf.image.decode_jpeg(img, channels=3)
-    
-    ... # do some preprocessing like resizing if necessary
-
-    return img
-
-def load_data_from_path(path):
-    list_ds = tf.data.Dataset.list_files(str('<YOUR PATH INCL. REGEX>'), shuffle=True)  # Get all images from subfolders
-    train_dataset = list_ds.take(-1)
-    # Set `num_parallel_calls` so multiple images are loaded/processed in parallel.
-    train_dataset = train_dataset.map(load, num_parallel_calls=AUTOTUNE)
-    return train_dataset
-
 # loads the data for a given path
-def load_data(path, batch_size):
-    
-    tf.data.Dataset
-
+def load_data(path, batch_size, label_mode="int"):
     # read the images from a given directory and create a dataset with the subdirectories as labels
     return tf.keras.utils.image_dataset_from_directory (
         BASE_DIR + path,                                # path to the data directory
         labels="inferred",                              # class labels are inferred from the subdirectory structure
-        label_mode="int",                               # labels are returned as integers
+        label_mode=label_mode,                          # labels are returned as integers
         class_names= ["Beetle", "Butterfly", "Cat",     # names of the classes
                       "Cow", "Dog", "Elephant", 
                       "Gorilla", "Hippo", "Lizard", 
                       "Monkey", "Mouse", "Panda", 
                       "Spider", "Tiger", "Zebra"],      
         color_mode="rgb",                               # color images
-        batch_size = batch_size,                                 # number of images to retrieve at a time
+        batch_size = batch_size,                        # number of images to retrieve at a time
         image_size=(image_size, image_size),            # images are resized to 256x256
         shuffle=True,                                   # shuffle the data
         seed=1,                                         # set the random seed for shuffling
@@ -68,15 +51,25 @@ def load_data(path, batch_size):
     )
 
 # load the data
-train_path = "train_aug" if augmentation else "train"
-train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches
+train_path = "train_aug" if augmentation else "testing"
+train_batches = load_data(train_path, 1) # training data is loaded in batches
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
+
+# extract the training data from the batches
+x_train = []
+y_train = []
+for x, y in train_batches:
+    x_train.extend(x.numpy())
+    y_train.extend(y.numpy())
+x_train = np.array(x_train)
+y_train = np.array(y_train)
 
 # load the model
 teacher_model = tf.keras.models.load_model("saved_models/model_new4_1")
 teacher_model.build(input_shape=(None, image_size, image_size, 3))
 teacher_prediction = teacher_model.predict(train_batches)
+teacher_prediction = tf.argmax(teacher_prediction, axis=1)
 
 for layer in teacher_model.layers:
     layer.trainable = False
@@ -85,7 +78,7 @@ student_model = loadModel()
 student_model.build(input_shape=(None, image_size, image_size, 3))
 
 # print the model summary
-student_model.summary()
+# student_model.summary()
 
 # initial learning rate
 lr = settings["learning_rate"]["initial_lr"]
@@ -101,9 +94,9 @@ if settings["learning_rate"]["decay"] == True:
         decay_rate=settings["learning_rate"]["decay_rate"], 
         staircase=False, name=None)
 
-def student_loss(y_teacher, y_student):
-    student_loss_fn = losses.SparseCategoricalCrossentropy(from_logits=True)
-    student_loss = student_loss_fn(y_teacher, y_student)
+def student_loss(y_student):
+    student_loss_fn = losses.SparseCategoricalCrossentropy()
+    student_loss = student_loss_fn(y_train, y_student)
     return student_loss
 
 def distillation_loss(y_teacher, y_student):
@@ -115,7 +108,7 @@ def distillation_loss(y_teacher, y_student):
 
 def total_loss(y_teacher, y_student):
     alpha = 0.1
-    return alpha * student_loss(y_teacher, y_student) + (1 - alpha) * distillation_loss(y_teacher, y_student)
+    return alpha * student_loss(y_student) + (1 - alpha) * distillation_loss(y_teacher, y_student)
 
 # compile the model
 student_model.compile(optimizer=optimizers.Adam(learning_rate=lr),
@@ -144,7 +137,7 @@ def get_callbacks():
   ]
 
 # train the model
-history = student_model.fit(train_batches, teacher_prediction, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
+history = student_model.fit(x_train, teacher_prediction, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
 
 # evaluate the model
 results = student_model.evaluate(test_batches)
