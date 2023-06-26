@@ -1,12 +1,14 @@
 import json
 import shutil
 import os
+import sys
 import tensorflow as tf
 import numpy as np
 from model import loadModel
 from datetime import datetime
-from tensorflow.keras import optimizers, losses, callbacks, mixed_precision
+from tensorflow.keras import optimizers, losses, callbacks, mixed_precision, metrics
 from tensorflow.data.experimental import AUTOTUNE
+from distiller import Distiller
 
 # load the model settings
 with open("config.json", 'r') as file:
@@ -52,18 +54,9 @@ def load_data(path, batch_size, label_mode="int"):
 
 # load the data
 train_path = "train_aug" if augmentation else "testing"
-train_batches = load_data(train_path, 1) # training data is loaded in batches
+train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
-
-# extract the training data from the batches
-x_train = []
-y_train = []
-for x, y in train_batches:
-    x_train.extend(x.numpy())
-    y_train.extend(y.numpy())
-x_train = np.array(x_train)
-y_train = np.array(y_train)
 
 # load the model
 teacher_model = tf.keras.models.load_model("saved_models/model_new4_1")
@@ -94,26 +87,16 @@ if settings["learning_rate"]["decay"] == True:
         decay_rate=settings["learning_rate"]["decay_rate"], 
         staircase=False, name=None)
 
-def student_loss(y_student):
-    student_loss_fn = losses.SparseCategoricalCrossentropy()
-    student_loss = student_loss_fn(y_train, y_student)
-    return student_loss
-
-def distillation_loss(y_teacher, y_student):
-    temp = 5
-    distillation_loss_fn = tf.keras.losses.KLDivergence()
-    y_teacher = tf.nn.softmax(y_teacher/temp)
-    y_student = tf.nn.softmax(y_student/temp)
-    return distillation_loss_fn(y_teacher, y_student)
-
-def total_loss(y_teacher, y_student):
-    alpha = 0.1
-    return alpha * student_loss(y_student) + (1 - alpha) * distillation_loss(y_teacher, y_student)
-
 # compile the model
-student_model.compile(optimizer=optimizers.Adam(learning_rate=lr),
-            loss=total_loss,
-            metrics=["accuracy"])
+distiller = Distiller(teacher=teacher_model, student=student_model)
+distiller.compile(
+    optimizer=optimizers.Adam(),
+    metrics=[metrics.SparseCategoricalAccuracy()],
+    student_loss_fn=losses.SparseCategoricalCrossentropy(),
+    distillation_loss_fn=losses.KLDivergence(),
+    alpha=0.1,
+    temperature=10,
+)
 
 # copy the config file and the current model configuration to the log directory
 os.makedirs("./" + log_dir, exist_ok=True)
@@ -137,10 +120,11 @@ def get_callbacks():
   ]
 
 # train the model
-history = student_model.fit(x_train, teacher_prediction, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
+history = distiller.fit(train_batches, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
+# history = student_model.fit(x_train, teacher_prediction, validation_data=val_batches, callbacks=get_callbacks(), epochs=epochs)
 
 # evaluate the model
-results = student_model.evaluate(test_batches)
+results = distiller.evaluate(test_batches)
 
 # save the test results
 f = open(log_dir + "/test_results.txt", "a")
