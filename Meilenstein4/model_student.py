@@ -93,6 +93,6 @@ def loadModel():
     x = Flatten() (x)
     x = Dense(15, activation='softmax', name='fc15') (x)
 
-    model = Model(img_input, x, name='model7')
+    model = Model(img_input, x)
 
     return model
