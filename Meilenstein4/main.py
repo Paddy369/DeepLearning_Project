@@ -51,13 +51,13 @@ def load_data(path, batch_size, label_mode="int"):
     )
 
 # load the data
-train_path = "train_aug" if augmentation else "train"
+train_path = "train_aug" if augmentation else "testing"
 train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
 
 # load the teacher and the student model
-teacher_model = tf.keras.models.load_model("saved_models/model_ms2")
+teacher_model = tf.keras.models.load_model("saved_models/best_model_ms2")
 teacher_model.build(input_shape=(None, image_size, image_size, 3))
 student_model = tf.keras.models.load_model("saved_models/model_student4_2", compile=False)
 student_model.build(input_shape=(None, image_size, image_size, 3))
@@ -118,9 +118,10 @@ history = distiller.fit(train_batches, validation_data=val_batches, callbacks=ge
 results = distiller.evaluate(test_batches)
 
 # save the test results
+print("results: " + str(results))
 f = open(log_dir + "/test_results.txt", "a")
 f.write("Accuracy: " + str(results[0]) + ", Student Loss: " + str(results[1]))
 f.close()
 
 # save the model
-student_model.save("saved_models/" + ID)
+student_model.save("saved_models/student_" + ID)
