@@ -1,3 +1,6 @@
+# CODE FROM KERAS!
+# https://keras.io/examples/vision/knowledge_distillation/
+
 import tensorflow as tf
 from tensorflow import keras
 
