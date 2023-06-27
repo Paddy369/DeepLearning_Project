@@ -59,7 +59,7 @@ test_batches = load_data("testing", test_batch_size)    # testing data is loaded
 # load the teacher and the student model
 teacher_model = tf.keras.models.load_model("saved_models/model_ms2")
 teacher_model.build(input_shape=(None, image_size, image_size, 3))
-student_model = tf.keras.models.load_model("saved_models/model_student3", compile=False)
+student_model = tf.keras.models.load_model("saved_models/model_student4_2", compile=False)
 student_model.build(input_shape=(None, image_size, image_size, 3))
 
 # print the model summary
