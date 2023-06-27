@@ -57,9 +57,9 @@ val_batches = load_data("validation", val_batch_size)   # validation data is loa
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
 
 # load the teacher and the student model
-teacher_model = tf.keras.models.load_model("saved_models/model_new4_1")
+teacher_model = tf.keras.models.load_model("saved_models/model_ms2")
 teacher_model.build(input_shape=(None, image_size, image_size, 3))
-student_model = loadModel()
+student_model = tf.keras.models.load_model("saved_models/model_student3", compile=False)
 student_model.build(input_shape=(None, image_size, image_size, 3))
 
 # print the model summary
