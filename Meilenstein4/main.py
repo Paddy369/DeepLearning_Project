@@ -79,7 +79,7 @@ if settings["learning_rate"]["decay"] == True:
         decay_rate=settings["learning_rate"]["decay_rate"], 
         staircase=False, name=None)
 
-# compile the model
+# compile the model using the distiller
 distiller = Distiller(teacher=teacher_model, student=student_model)
 distiller.compile(
     optimizer=optimizers.Adam(learning_rate=lr),

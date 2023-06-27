@@ -1,0 +1,9 @@
+{
+    "pruning": {
+        "enable": true,
+        "scheduler": "PolynomialDecay",
+        "initial_sparsity": 0.50,
+        "final_sparsity": 0.80,
+        "epochs": 3
+    }
+}
