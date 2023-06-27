@@ -57,9 +57,9 @@ val_batches = load_data("validation", val_batch_size)   # validation data is loa
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
 
 # load the teacher and the student model
-teacher_model = tf.keras.models.load_model("saved_models/model_new4_1")
+teacher_model = tf.keras.models.load_model("saved_models/model_ms2")
 teacher_model.build(input_shape=(None, image_size, image_size, 3))
-student_model = loadModel()
+student_model = tf.keras.models.load_model("saved_models/model_student3", compile=False)
 student_model.build(input_shape=(None, image_size, image_size, 3))
 
 # print the model summary
@@ -93,21 +93,21 @@ distiller.compile(
 # copy the config file and the current model configuration to the log directory
 os.makedirs("./" + log_dir, exist_ok=True)
 shutil.copyfile("config.json", "./" + log_dir + "/config.json")
-shutil.copyfile("model.py", "./" + log_dir + "/model.py")
+shutil.copyfile("model_student.py", "./" + log_dir + "/model_student.py")
 # copy the config file and the current model configuration to the model directory
 os.makedirs("./" + model_dir, exist_ok=True)
 shutil.copyfile("config.json", "./" + model_dir + "/config.json")
-shutil.copyfile("model.py", "./" + model_dir + "/model.py")
+shutil.copyfile("model_student.py", "./" + model_dir + "/model_student.py")
 # create a directory for the saved models
 os.makedirs("./saved_models", exist_ok=True)
 
 # create a callback to log the data for tensorboard
 tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True)
-early_stopping_callback = callbacks.EarlyStopping(monitor='val_loss', patience=10)
+early_stopping_callback = callbacks.EarlyStopping(monitor='val_sparse_categorical_accuracy', patience=10)
 
 def get_callbacks():
   return [
-    callbacks.EarlyStopping(monitor='val_loss', patience=10),
+    callbacks.EarlyStopping(monitor='val_sparse_categorical_accuracy', patience=10),
     callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_images=True),
   ]
 
@@ -119,7 +119,7 @@ results = distiller.evaluate(test_batches)
 
 # save the test results
 f = open(log_dir + "/test_results.txt", "a")
-f.write("Loss: " + str(results[0]) + ", Accuracy: " + str(results[1]))
+f.write("Accuracy: " + str(results[0]) + ", Student Loss: " + str(results[1]))
 f.close()
 
 # save the model
