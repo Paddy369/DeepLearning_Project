@@ -1,8 +1,6 @@
 import json
 import tensorflow as tf
-from datetime import datetime
-import pandas as pd
-from IPython.display import display
+import datetime
 
 BASE_DIR = '../images'
 names = ["Beetle", "Butterfly", "Cat", "Cow", "Dog", "Elephant", "Gorilla", "Hippo", "Lizard", "Monkey", "Mouse", "Panda", "Spider", "Tiger", "Zebra"]
@@ -43,7 +41,7 @@ def jsonify(predict):
 
 # load the data
 predict_batches = tf.keras.utils.image_dataset_from_directory (
-    BASE_DIR + '/predict',
+    BASE_DIR + '/testing',
     labels="inferred",
     label_mode="int",
     class_names=None,
@@ -60,13 +58,19 @@ predict_batches = tf.keras.utils.image_dataset_from_directory (
 )
 
 # load the tensorflow model
-model = tf.keras.models.load_model('saved_models/best_model_ms2')
+model = tf.keras.models.load_model('saved_models/model_student4_3')
 
 # model.summary()
 
-# predict the results
+# predict the results and measure the runtime
+print("starting...")
+start = datetime.datetime.now()
 predict = model.predict(predict_batches)
-printPretty(predict)
+end = datetime.datetime.now()
+print("Prediction runtime: " + str((end - start).total_seconds()))
+
+# print the results in a readable format
+# printPretty(predict)
 # get dominant class
 predict = tf.argmax(predict, axis=1)
 # persist the results in a json file

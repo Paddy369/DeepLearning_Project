@@ -32,19 +32,14 @@ def loadModel():
     x = BatchNormalization(axis=1)(x)
     x = Activation('relu')(x)
 
-    shortcut = Conv2D(128, (1, 1), strides=(2, 2))(y)
-    shortcut = BatchNormalization(axis=1)(shortcut)
-
-    x = layers.add([x, shortcut])
-    y = Activation('relu')(x)
-    #####
-
-    ##### CONV
-    x = Conv2D(256, (1, 1), strides=(2, 2))(y)
+    x = Conv2D(128, 3, padding='same')(x)
     x = BatchNormalization(axis=1)(x)
     x = Activation('relu')(x)
 
-    shortcut = Conv2D(256, (1, 1), strides=(2, 2))(y)
+    x = Conv2D(512, (1, 1))(x)
+    x = BatchNormalization(axis=1)(x)
+
+    shortcut = Conv2D(512, (1, 1), strides=(2, 2))(y)
     shortcut = BatchNormalization(axis=1)(shortcut)
 
     x = layers.add([x, shortcut])
@@ -52,15 +47,24 @@ def loadModel():
     #####
 
     ##### IDENTITY
-    x = Conv2D(256, (1, 1))(y)
+    x = Conv2D(128, (1, 1))(y)
     x = BatchNormalization(axis=1)(x)
     x = Activation('relu')(x)
+
+    x = Conv2D(128, 3,
+               padding='same')(x)
+    x = BatchNormalization(axis=1)(x)
+    x = Activation('relu')(x)
+
+    x = Conv2D(512, (1, 1))(x)
+    x = BatchNormalization(axis=1)(x)
 
     x = layers.add([x, y])
     x = Activation('relu')(x)
     #####
 
     x = AveragePooling2D((7, 7), name='avg_pool')(x)
+
     x = Flatten() (x)
     x = Dense(15, activation='softmax', name='fc15') (x)
 
