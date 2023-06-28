@@ -1,14 +1,14 @@
 {
-    "model_id": "model_studentf5_extended1",
+    "model_id": "model_studentf4aug",
     "batch_size_train": 24,
     "batch_size_val": 8,
     "batch_size_test": 8,
     "batch_size_predict": 8,
     "epochs": 10,
     "image_size": 256,
-    "augmentation": false,
+    "augmentation": true,
     "learning_rate": {
-        "decay": false,
+        "decay": true,
         "initial_lr": 0.001,
         "steps": 1500,
         "decay_rate": 0.96

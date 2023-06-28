@@ -32,19 +32,10 @@ def loadModel():
     x = BatchNormalization(axis=1)(x)
     x = Activation('relu')(x)
 
-    shortcut = Conv2D(128, (1, 1), strides=(2, 2))(y)
-    shortcut = BatchNormalization(axis=1)(shortcut)
-
-    x = layers.add([x, shortcut])
-    y = Activation('relu')(x)
-    #####
-
-    ##### CONV
-    x = Conv2D(256, (1, 1), strides=(2, 2))(y)
+    x = Conv2D(512, (1, 1))(x)
     x = BatchNormalization(axis=1)(x)
-    x = Activation('relu')(x)
 
-    shortcut = Conv2D(256, (1, 1), strides=(2, 2))(y)
+    shortcut = Conv2D(512, (1, 1), strides=(2, 2))(y)
     shortcut = BatchNormalization(axis=1)(shortcut)
 
     x = layers.add([x, shortcut])
@@ -52,9 +43,12 @@ def loadModel():
     #####
 
     ##### IDENTITY
-    x = Conv2D(256, (1, 1))(y)
+    x = Conv2D(128, (1, 1))(y)
     x = BatchNormalization(axis=1)(x)
     x = Activation('relu')(x)
+
+    x = Conv2D(512, (1, 1))(x)
+    x = BatchNormalization(axis=1)(x)
 
     x = layers.add([x, y])
     x = Activation('relu')(x)

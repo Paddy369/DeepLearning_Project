@@ -51,7 +51,7 @@ def load_data(path, batch_size, label_mode="int"):
     )
 
 # load the data
-train_path = "train_aug" if augmentation else "testing"
+train_path = "train_aug" if augmentation else "train"
 train_batches = load_data(train_path, train_batch_size) # training data is loaded in batches
 val_batches = load_data("validation", val_batch_size)   # validation data is loaded in batches
 test_batches = load_data("testing", test_batch_size)    # testing data is loaded in batches
@@ -59,10 +59,11 @@ test_batches = load_data("testing", test_batch_size)    # testing data is loaded
 # load the teacher and the student model
 teacher_model = tf.keras.models.load_model("saved_models/best_model_ms2")
 teacher_model.build(input_shape=(None, image_size, image_size, 3))
-student_model = loadModel()
+student_model = tf.keras.models.load_model("saved_models/student_model_studentf5")
 student_model.build(input_shape=(None, image_size, image_size, 3))
 
 # print the model summary
+teacher_model.summary()
 # student_model.summary()
 
 # initial learning rate

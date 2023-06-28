@@ -22,47 +22,25 @@ from keras.utils import layer_utils
 def loadModel():
     img_input = Input(shape=(256, 256, 3))
     x = ZeroPadding2D((3, 3))(img_input)
-    x = Conv2D(64, (7, 7), strides=(2, 2), name='conv1')(x)
-    x = BatchNormalization(axis=1, name='bn_conv1')(x)
+    x = Conv2D(64, (5, 5), strides=(2, 2))(x)
+    x = Conv2D(64, (3, 3), strides=(2, 2))(x)
+    x = BatchNormalization(axis=1)(x)
     x = Activation('relu')(x)
-    y = MaxPooling2D((3, 3), strides=(2, 2))(x)
+    x = MaxPooling2D((3, 3), strides=(2, 2))(x)
 
-    ##### CONV
-    x = Conv2D(128, (1, 1), strides=(2, 2))(y)
+    x = Conv2D(128, (1, 1), strides=(2, 2))(x)
+    x = Conv2D(128, (1, 1), strides=(2, 2))(x)
     x = BatchNormalization(axis=1)(x)
     x = Activation('relu')(x)
 
-    shortcut = Conv2D(128, (1, 1), strides=(2, 2))(y)
-    shortcut = BatchNormalization(axis=1)(shortcut)
-
-    x = layers.add([x, shortcut])
-    y = Activation('relu')(x)
-    #####
-
-    ##### CONV
-    x = Conv2D(256, (1, 1), strides=(2, 2))(y)
+    x = Conv2D(256, (1, 1))(x)
+    x = Conv2D(256, (1, 1))(x)
     x = BatchNormalization(axis=1)(x)
     x = Activation('relu')(x)
 
-    shortcut = Conv2D(256, (1, 1), strides=(2, 2))(y)
-    shortcut = BatchNormalization(axis=1)(shortcut)
-
-    x = layers.add([x, shortcut])
-    y = Activation('relu')(x)
-    #####
-
-    ##### IDENTITY
-    x = Conv2D(256, (1, 1))(y)
-    x = BatchNormalization(axis=1)(x)
-    x = Activation('relu')(x)
-
-    x = layers.add([x, y])
-    x = Activation('relu')(x)
-    #####
-
-    x = AveragePooling2D((7, 7), name='avg_pool')(x)
+    x = MaxPooling2D((7, 7))(x)
     x = Flatten() (x)
-    x = Dense(15, activation='softmax', name='fc15') (x)
+    x = Dense(15, activation='softmax') (x)
 
     model = Model(img_input, x)
 
